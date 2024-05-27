@@ -1,0 +1,2 @@
+# syntag
+Monorepo for Syntag
