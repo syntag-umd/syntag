@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Conversations {
+  id                Int                @id @unique @default(autoincrement())
+  uuid              String             @unique(map: "ix_Conversations_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
+  model             LLM
+  medium            Medium
+  language          Language
+  tokenCount        Int
+  status            ConversationStatus @default(TRYING_TO_FIND_ISSUE)
+  apiSpecification  Json?              @default("{}")
+  assistantId       String
+  collectedFields   Json?              @default("{}")
+  currentField      String?            @default("")
+  currentIssue      Json?              @default("{}")
+  fieldDescriptions Json?              @default("{}")
+  fieldsToCollect   Json?              @default("{}")
+  findIssueCount    Int?               @default(0)
+  issues            Json?              @default("{}")
+  usersUuid         String             @db.Uuid
+  users             users              @relation(fields: [usersUuid], references: [uuid])
+  messages          messages[]
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+model issue {
+  id                 Int            @id @default(autoincrement())
+  uuid               String         @unique(map: "ix_issue_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usersUuid          String         @db.Uuid
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @default(now())
+  name               String
+  description        String
+  resolution_type    ResolutionType
+  fields_to_collect  Json?          @default("{}")
+  field_descriptions Json?          @default("{}")
+  users              users          @relation(fields: [usersUuid], references: [uuid])
+}
+
+model messages {
+  id               Int           @id @unique @default(autoincrement())
+  uuid             String        @unique(map: "ix_messages_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now())
+  role             Role
+  content          String
+  conversationUuid String        @db.Uuid
+  tokenCount       Int
+  usersUuid        String        @db.Uuid
+  Conversations    Conversations @relation(fields: [conversationUuid], references: [uuid])
+  users            users         @relation(fields: [usersUuid], references: [uuid])
+}
+
+model users {
+  id            Int             @id @unique @default(autoincrement())
+  uuid          String          @unique(map: "ix_users_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now())
+  name          String
+  email         String?
+  api_key       String
+  Conversations Conversations[]
+  issue         issue[]
+  messages      messages[]
+}
+
+enum ConversationStatus {
+  TRYING_TO_FIND_ISSUE
+  FOUND_UNRESOLVABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  FOUND_UNIDENTIFIABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  FOUND_RESOLVABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  FOUND_AUTORESOLVABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  COLLECTING_ISSUE_INFO
+  AUTORESOLVED_ISSUE
+  CONVERSATION_ENDED
+}
+
+enum LLM {
+  GROQ
+  GPT_3_5_TURBO
+  GPT_4
+}
+
+enum Language {
+  ENGLISH
+  SPANISH
+}
+
+enum Medium {
+  CHAT
+  VOICECHAT
+  PHONE
+}
+
+enum ResolutionType {
+  UNRESOLVABLE
+  RESOLVABLE_VIA_TICKET
+  AUTORESOLVABLE
+}
+
+enum Role {
+  USER
+  SYSTEM
+}

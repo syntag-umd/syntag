@@ -1,0 +1,110 @@
+
+@media only screen and (max-width: 1200px) {
+    .container {
+        width: 90%;
+    }
+    .demo .grid .phone-container .phone-inner,
+    .demo .grid .phone-container .phone-receive-alert {
+        width: 30vw;
+        height: 70vw;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .feature-features .content-grid {
+        -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .section1 .container{
+        width: 100%;
+    }
+    .section1 .sticky-slider-container {
+        -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .section1 .sticky-slider-container .sticky-slider-left {
+        background: color(srgb 0.0809 0.0661 0.0577);
+        padding: 80px 5% 10px 5%;
+    }
+    .section1 .sticky-slider-container .sticky-slider-left .content {
+        position: initial;
+    }
+    .section1 .sticky-slider-container .sticky-slider-right, .section1 .headline{
+        padding: 0 5%
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .footer .footer-main {
+        -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+        gap: 70px;
+    }
+    .header-main {
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+    }
+    .header-main .header-inner .menu-items {
+        position: fixed;
+        left: -100%;
+        top: 64px;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
+        height: calc(100vh - 64px);
+        background: rgba(0, 0, 0, 0.8);
+        padding: 26px;
+        -webkit-transition: .3s ease-in-out;
+        -o-transition: .3s ease-in-out;
+        transition: .3s ease-in-out;
+    }
+    .header-main .header-inner .menu-items.active {
+        left: 0;
+    }
+    .header-main .header-menu {
+        display: initial;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .create-account-sec {
+        text-align: center;
+    }
+    .create-account-sec .cta-container {
+        -webkit-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
+    }
+    .demo .grid {
+        -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .features-container .content-row {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
+    }
+    .features-container .content-row:nth-child(2),
+    .features-container .content-row:nth-child(4) {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+            -ms-flex-direction: column-reverse;
+                flex-direction: column-reverse;
+    }
+    .demo .grid .phone-container .phone-inner,
+    .demo .grid .phone-container .phone-receive-alert {
+        width: 60vw;
+        height: 133vw;
+    }
+    .demo .grid .right-side-container .demo-buttons {
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+    }
+}

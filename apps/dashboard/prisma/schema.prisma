@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+model conversation {
+  id                Int                @id @unique @default(autoincrement())
+  uuid              String             @unique(map: "ix_conversation_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid          String             @db.Uuid
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
+  model             LLM?
+  medium            Medium
+  language          Language
+  tokenCount        Int
+  status            ConversationStatus @default(TRYING_TO_FIND_ISSUE)
+  apiSpecification  Json?              @default("{}")
+  assistantId       String
+  collectedFields   Json?              @default("{}")
+  currentField      String?            @default("")
+  currentIssue      Json?              @default("{}")
+  fieldDescriptions Json?              @default("{}")
+  fieldsToCollect   Json?              @default("{}")
+  findIssueCount    Int?               @default(0)
+  issues            Json?              @default("{}")
+  user              user               @relation(fields: [userUuid], references: [uuid])
+  message           message[]
+}
+
+model faqbot_conversation {
+  id             Int              @id @unique @default(autoincrement())
+  uuid           String           @unique(map: "ix_faqbot_conversation_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid       String           @db.Uuid
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  model          LLM
+  medium         Medium
+  language       Language
+  tokenCount     Int
+  faq            String
+  user           user             @relation(fields: [userUuid], references: [uuid])
+  faqbot_message faqbot_message[]
+}
+
+model faqbot_message {
+  id                     Int                 @id @unique @default(autoincrement())
+  uuid                   String              @unique(map: "ix_faqbot_message_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid               String              @db.Uuid
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @default(now())
+  role                   Role
+  content                String
+  faqbotConversationUuid String              @db.Uuid
+  tokenCount             Int
+  faqbot_conversation    faqbot_conversation @relation(fields: [faqbotConversationUuid], references: [uuid])
+  user                   user                @relation(fields: [userUuid], references: [uuid])
+}
+
+model issue {
+  id                 Int            @id @unique @default(autoincrement())
+  uuid               String         @unique(map: "ix_issue_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid           String         @db.Uuid
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @default(now())
+  name               String
+  description        String
+  resolution_type    ResolutionType
+  fields_to_collect  Json?          @default("{}")
+  field_descriptions Json?          @default("{}")
+  user               user           @relation(fields: [userUuid], references: [uuid])
+}
+
+model message {
+  id               Int          @id @unique @default(autoincrement())
+  uuid             String       @unique(map: "ix_message_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid         String       @db.Uuid
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now())
+  role             Role
+  content          String
+  conversationUuid String       @db.Uuid
+  tokenCount       Int
+  conversation     conversation @relation(fields: [conversationUuid], references: [uuid])
+  user             user         @relation(fields: [userUuid], references: [uuid])
+}
+
+model phone_number {
+  id                          Int              @id @unique @default(autoincrement())
+  uuid                        String           @unique(map: "ix_phone_number_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid                    String           @db.Uuid
+  voice_assistant_uuid        String?          @db.Uuid
+  createdAt                   DateTime         @default(now())
+  pn                          String?
+  vapi_phone_number_id        String?
+  stripe_subscription_item_id String?
+  user                        user             @relation(fields: [userUuid], references: [uuid])
+  voice_assistant             voice_assistant? @relation(fields: [voice_assistant_uuid], references: [uuid], onDelete: Restrict)
+}
+
+model user {
+  id                          Int                   @id @unique @default(autoincrement())
+  uuid                        String                @unique(map: "ix_user_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                   DateTime              @default(now())
+  updatedAt                   DateTime              @default(now())
+  name                        String
+  email                       String?
+  api_key                     String
+  faqbot_faq                  String?
+  faqbot_assistant_id         String?
+  autoresolution_assistant_id String?
+  stripe_customer_id          String?
+  clerk_id                    String?               @unique
+  conversation                conversation[]
+  faqbot_conversation         faqbot_conversation[]
+  faqbot_message              faqbot_message[]
+  issue                       issue[]
+  message                     message[]
+  phone_number                phone_number[]
+  voice_assistant             voice_assistant[]
+}
+
+model voice_assistant {
+  id                   Int            @id @unique @default(autoincrement())
+  uuid                 String         @unique(map: "ix_voice_assistant_uuid") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userUuid             String         @db.Uuid
+  createdAt            DateTime       @default(now())
+  profile_pic_url      String?
+  chatgpt_assistant_id String?
+  vapi_assistant_id    String?
+  name                 String?
+  phone_number         phone_number[]
+  user                 user           @relation(fields: [userUuid], references: [uuid])
+}
+
+enum ConversationStatus {
+  TRYING_TO_FIND_ISSUE
+  FOUND_UNRESOLVABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  FOUND_UNIDENTIFIABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  FOUND_RESOLVABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  FOUND_AUTORESOLVABLE_ISSUE_WAITING_FOR_FINAL_ISSUE_DIAGNOSIS
+  COLLECTING_ISSUE_INFO
+  AUTORESOLVED_ISSUE
+  CONVERSATION_ENDED
+}
+
+enum LLM {
+  GPT_3_5
+  GPT_4
+}
+
+enum Language {
+  ENGLISH
+  SPANISH
+}
+
+enum Medium {
+  PHONE
+  VOICECHAT
+  CHAT
+}
+
+enum ResolutionType {
+  UNRESOLVABLE
+  RESOLVABLE_VIA_TICKET
+  AUTORESOLVABLE
+}
+
+enum Role {
+  SYSTEM
+  USER
+}
