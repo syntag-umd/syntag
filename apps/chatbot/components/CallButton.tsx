@@ -20,6 +20,6 @@ const CallButton = ({
             : (<PhoneOutgoing color='white' size={15}/>)}
         </button>
     );
-}
+}   
 
 export default CallButton

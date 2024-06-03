@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "preinstall": "npx only-allow pnpm", 
     "postinstall": "prisma generate"
   },
   "dependencies": {

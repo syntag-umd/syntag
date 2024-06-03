@@ -1,6 +1,9 @@
 {
   "name": "syntag",
   "version": "1.0.0",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
   "workspaces":[
     "docs",
     "apps/*",
