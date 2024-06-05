@@ -2,7 +2,6 @@ import React from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { Grid, GridItem, Stack } from "@chakra-ui/react";
-
 export default function layout(props: { children: React.ReactNode }) {
 
   return (

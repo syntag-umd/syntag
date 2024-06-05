@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import phone from '../assets/phone.png';
 import acceptCall from '../assets/accept-call.json';
 import waitForConnection from '../assets/wait-for-connection.json';
 import Lottie from 'react-lottie';
 import '../styles/play-pause.css';
-import { useVapi, CALL_STATUS } from '../UseVapi.ts';
+import { useVapi, CALL_STATUS } from '@syntag/vapi/useVapi';
 
 export default function ShrunkHeroArea() {
     const { callStatus, toggleCall } = useVapi();

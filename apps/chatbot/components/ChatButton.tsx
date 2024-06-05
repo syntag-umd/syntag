@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import AIChatBox from "./ChatBox";
 import { Button } from "./ui/button";
 import { Bot } from "lucide-react";
-import { Box } from "@chakra-ui/layout";
 import { Popover, PopoverContent, Text, PopoverArrow, PopoverCloseButton, PopoverBody, PopoverTrigger, Portal } from "@chakra-ui/react";
 
 const AIChatButton = () => {
@@ -26,7 +25,7 @@ const AIChatButton = () => {
   }, []);
 
   return (
-    <Box>
+    <>
         <Popover
           defaultIsOpen={true}
           closeOnBlur={false}
@@ -54,7 +53,7 @@ const AIChatButton = () => {
           </Portal>
         </Popover>
         <AIChatBox open={chatBoxOpen} onClose={() => setChatBoxOpen(false)} />
-    </Box>
+    </>
   );
 };
 

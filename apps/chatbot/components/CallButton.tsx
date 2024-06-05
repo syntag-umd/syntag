@@ -1,5 +1,5 @@
 import { PhoneOff, PhoneOutgoing, Loader2 } from "lucide-react";
-import { CALL_STATUS, useVapi } from "@/app/hooks/useVapi";
+import { CALL_STATUS, useVapi } from "@syntag/vapi/useVapi";
 
 const CallButton = ({
     toggleCall,
@@ -15,9 +15,9 @@ const CallButton = ({
             } flex items-center justify-center`}
             onClick={toggleCall}
         >
-            {callStatus === CALL_STATUS.ACTIVE ? (<PhoneOff color='white' size={15}/>) 
-            : callStatus === CALL_STATUS.LOADING ? (<Loader2 color='white' size={15} className="animate-spin" />) 
-            : (<PhoneOutgoing color='white' size={15}/>)}
+            { callStatus === CALL_STATUS.ACTIVE && (<PhoneOff color='white' size={15}/>) }
+            { callStatus === CALL_STATUS.LOADING && (<Loader2 color='white' size={15} className="animate-spin" />)} 
+            { callStatus === CALL_STATUS.INACTIVE && (<PhoneOutgoing color='white' size={15}/>)}
         </button>
     );
 }   

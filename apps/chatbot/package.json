@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "preinstall": "npx only-allow pnpm", 
-    "postinstall": "prisma generate"
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "prisma generate",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@syntag/ui": "workspace:*",
+    "@syntag/vapi": "workspace:*",
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
@@ -45,6 +48,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@syntag/tsconfig": "workspace:*",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -54,6 +58,6 @@
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5"
+    "typescript": "latest"
   }
 }

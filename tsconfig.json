@@ -1,0 +1,9 @@
+{
+    "extends": "@syntag/tsconfig/base.json",
+    "compilerOptions": {
+        "outDir": "dist" 
+    },
+    "exclude": [
+        "./dist/**/*"
+    ]
+}

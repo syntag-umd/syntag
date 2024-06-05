@@ -1,6 +1,6 @@
 
 export async function generateId(language: string) {
-    const apiKey = process.env.NEXT_PUBLIC_SYNTAG_API_KEY;
+    const apiKey = process.env.SYNTAG_API_KEY;
     if (!apiKey) {
         throw Error("SYNTAG_API_KEY is not set");
     }

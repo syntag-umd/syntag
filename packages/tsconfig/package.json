@@ -1,0 +1,9 @@
+{
+    "name": "@syntag/tsconfig",
+    "version": "1.0.0",
+    "private": true,
+    "license": "ISC",
+    "publishConfig": {
+        "access": "public"
+    }
+}

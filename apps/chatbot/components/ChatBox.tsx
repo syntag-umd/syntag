@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Stack, Avatar, Text, AvatarBadge } from '@chakra-ui/react';
 import ChatMessage from './ChatMessage';
 import ResolutionModal from './ResolutionModal';
-import { CALL_STATUS, useVapi } from '@/app/hooks/useVapi';
+import { CALL_STATUS, useVapi } from '@syntag/vapi/useVapi';
 import CallButton from './CallButton';
 
 

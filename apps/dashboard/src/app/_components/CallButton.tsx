@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import { CALL_STATUS, type useVapi } from "../../lib/hooks/useVapi";
+import { CALL_STATUS, type useVapi } from "@syntag/vapi/useVapi";
 import { Button } from "~/components/ui/button";
 import { useState } from "react";
 

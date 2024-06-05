@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import CallButton from "./CallButton";
-import { useVapi } from "~/lib/hooks/useVapi";
+import { useVapi } from "@syntag/vapi/useVapi";
 import { type Assistant } from "@vapi-ai/web/api";
 
 
@@ -39,8 +39,8 @@ interface AgentCardProps {
   phoneNumber?: string;
 }
 
-function AgentCard(props: AgentCardProps) {
-  const { toggleCall, callStatus } = useVapi(props.assistantId.id);
+function AgentCard(props: Readonly<AgentCardProps>) {
+  const { toggleCall, callStatus } = useVapi({assistantId: props.assistantId});
 
   return (
       <Card overflow="hidden" p={2} bg={"var(--card)"} className="min-w-[250px]">    
@@ -74,7 +74,7 @@ function AgentCard(props: AgentCardProps) {
 
 export default AgentCard;
 
-function DeleteAgent(props: AgentCardProps) {
+function DeleteAgent(props: Readonly<AgentCardProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errordialogMessage, setErrorDialogMessage] = useState<

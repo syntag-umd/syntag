@@ -8,12 +8,14 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "dev": "next dev",
-    "preinstall": "npx only-allow pnpm", 
+    "preinstall": "npx only-allow pnpm",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
+    "@syntag/ui": "workspace:*",
+    "@syntag/vapi": "workspace:*",
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
     "@clerk/nextjs": "^5.0.3",
@@ -54,6 +56,7 @@
     "zod": "^3.23.6"
   },
   "devDependencies": {
+    "@syntag/tsconfig": "workspace:*",
     "@types/eslint": "^8.56.2",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.11.20",
