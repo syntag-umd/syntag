@@ -5,7 +5,6 @@ const CallButton = ({
     toggleCall,
     callStatus,
   }: Partial<ReturnType<typeof useVapi>>) => {
-
     return (
         <button
             className={`transition ease-in-out ${

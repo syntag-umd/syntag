@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ToastProvider } from '@/components/providers/toast-provider'
 import { Providers } from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Intelligent ChatBot',
-  description: 'Intelligent Taking Bot',
+  title: 'SynTag ChatBot',
+  description: 'Intelligent Chatbot from SynTag Bot',
 }
 
 export default function RootLayout({
@@ -34,7 +33,6 @@ export default function RootLayout({
           />
         </head>
         <body className={inter.className}>
-          <ToastProvider />
             <Providers>
               {children}
             </Providers>
