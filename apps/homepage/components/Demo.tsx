@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import phone from '../assets/phone.png'
+import Image from 'next/image'
 
 
 export default function Demo() {
@@ -30,7 +31,7 @@ export default function Demo() {
                 <h1 className='animate'>Calling Demo</h1>
                 <div className="grid">
                     <div className="phone-container">
-                        <img src={phone} alt="" />
+                        <Image src={phone} alt="" />
                         <div className={showEffect ? "phone-receive-alert active" : "phone-receive-alert"}></div>
                         <div className="phone-inner">
                             <h2>Mike Smith</h2>

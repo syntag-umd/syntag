@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import createAgent from '../assets/box-images/create_agent.png';
 import multipleLanguages from '../assets/box-images/multiple_languages.png';
 import agents from '../assets/box-images/agents.png';
+import Image from 'next/image';
 
 export default function Section1() {
     useEffect(() => {
@@ -57,13 +58,13 @@ export default function Section1() {
                         </div>
                         <div className="sticky-slider-right">
                             <div className="img-container">
-                                <img src={createAgent} alt="" />
+                                <Image src={createAgent} alt="Create an agent" />
                             </div>
                             <div className="img-container">
-                                <img src={multipleLanguages} alt="" />
+                                <Image src={multipleLanguages} alt="Voice Agents can speak multiple languages" />
                             </div>
                             <div className="img-container">
-                                <img src={agents} alt="" />
+                                <Image src={agents} alt="Maintain multiple agents at once" />
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import audio from '../assets/audio/audio.mp3';
+// import audio from '../assets/audio/audio.mp3';
 import '../styles/play-pause.css'
 
 export default function HeroArea() {
@@ -32,7 +32,7 @@ export default function HeroArea() {
                         {/* <button className="cta">Watch Video</button> */}
                         <button className="cta">Try out now</button>
                     </div>
-                    <div className="play-button-container animate">
+                    {/* <div className="play-button-container animate">
                         <div className="box-header">
                             <p>...or listen in.</p>
                         </div>
@@ -51,7 +51,7 @@ export default function HeroArea() {
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

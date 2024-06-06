@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import logo from '../assets/logo.svg'
+import Image from 'next/image';
 
 export default function Header({ logowidth }) {
     const [menu, setMenu] = useState(false);
@@ -29,7 +30,7 @@ export default function Header({ logowidth }) {
             <div className="container">
                 <div className="header-inner">
                     <div className="logo-container">
-                        <img src={logo} width={logowidth} alt="" />
+                        <Image src={logo} width={logowidth} alt="" />
                     </div>
                     <div className={menu ? "menu-items active" : "menu-items"}>
                         {/* <p onClick={viewFeatures}>Features</p>

@@ -1,16 +1,15 @@
+"use client"
+
 import React, { useCallback, useEffect } from 'react';
-import Header from './components/Header';
+import Header from '../components/Header';
 import Particles from "react-particles";
 import { loadSlim } from "tsparticles-slim";
-import './styles/default.css'
-import './styles/responsive.css'
-import HeroArea from './components/HeroArea';
-import ShrunkHeroArea from './components/ShrunkHeroArea';
-import Section1 from './components/Section1';
-import Features from './components/Features';
-import Demo from './components/Demo';
-import FeaturesSection from './components/FeaturesSection';
-import Footer from './components/Footer';
+import '../styles/default.css'
+import '../styles/responsive.css'
+import ShrunkHeroArea from '../components/ShrunkHeroArea';
+import Section1 from '../components/Section1';
+import FeaturesSection from '../components/FeaturesSection';
+import Footer from '../components/Footer';
 
 
 const activateElementsSequentially = (elements) => {
@@ -72,11 +71,7 @@ const activateElementsSequentially = (elements) => {
 };
 
 
-
-
-
-
-const App = () => {
+export default function Home() {
   const particlesInit = useCallback(async engine => {
     await loadSlim(engine);
   }, []);
@@ -176,5 +171,3 @@ const App = () => {
     </div>
   );
 };
-
-export default App;

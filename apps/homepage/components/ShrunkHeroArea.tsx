@@ -5,9 +5,10 @@ import waitForConnection from '../assets/wait-for-connection.json';
 import Lottie from 'react-lottie';
 import '../styles/play-pause.css';
 import { useVapi, CALL_STATUS } from '@syntag/vapi/useVapi';
+import Image from 'next/image';
 
 export default function ShrunkHeroArea() {
-    const { callStatus, toggleCall } = useVapi();
+    const { callStatus, toggleCall } = useVapi({toggledLanguage: "ENGLISH"});
 
     const defaultOptions = {
         loop: true,
@@ -49,7 +50,7 @@ export default function ShrunkHeroArea() {
                     </div>
                     <div className="demo-content">
                         <div className="phone-container">
-                            <img src={phone} alt="" />
+                            <Image src={phone} alt="" />
                             <div className="phone-inner">
                                 <h2>Mike Smith</h2>
                                 <p>+1 (510) 721 3875</p>

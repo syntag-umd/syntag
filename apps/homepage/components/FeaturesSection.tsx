@@ -6,15 +6,12 @@ export default function FeaturesSection() {
         <div className="feature-features">
             <div className="container">
                 <h1 className='animate'>Our Value</h1>
-
                 <div className="content-grid">
-                    
-
                     {/* Second Column */}
                     <div className="content-box">
                         <FaMicrophoneAlt className="icon" /> {/* Add icon */}
                         <h3>Brand-Specific Voice and Personality</h3>
-                        <p>Our advanced features allow you to fine-tune the voice and personality of your chatbot, reflecting your brand's specific tone and style.</p>
+                        <p>Our advanced features allow you to fine-tune the voice and personality of your chatbot, reflecting your brand&apos;s specific tone and style.</p>
                     </div>
                     <div className="content-box">
                         <FaHeartbeat className="icon" /> {/* Add icon */}
