@@ -152,7 +152,8 @@ enum ConversationStatus {
 }
 
 enum LLM {
-  GPT_3_5
+  GROQ
+  GPT_3_5_TURBO
   GPT_4
 }
 

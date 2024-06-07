@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import logo from "~/../public/logo.png";
+import logo from "../../../public/logo.png";
 import { Link } from "@chakra-ui/next-js";
 import { UserButton } from "@clerk/nextjs";
 import { Box, Flex, Stack } from "@chakra-ui/react";

@@ -1,0 +1,22 @@
+{
+  "name": "@syntag/db",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/client.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "latest"
+  },
+  "devDependencies": {
+    "@syntag/tsconfig": "workspace:*",
+    "@types/node": "^20.14.2",
+    "prisma": "latest"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

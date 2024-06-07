@@ -10,8 +10,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { db } from "~/server/db";
-import type { AuthObject } from "@clerk/backend/internal";
+import { db } from "@syntag/db";
+import { type ClerkMiddlewareAuthObject } from "@clerk/nextjs/server";
 
 /**
  * 1. CONTEXT
@@ -25,10 +25,13 @@ import type { AuthObject } from "@clerk/backend/internal";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: {
+
+interface TRPCContext {
   headers: Headers;
-  auth?: AuthObject;
-}) => {
+  auth?: ClerkMiddlewareAuthObject;
+}
+
+export const createTRPCContext = async (opts: TRPCContext) => {
   return {
     db,
     ...opts,

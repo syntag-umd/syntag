@@ -3,7 +3,8 @@
   "tasks": {
     "build": {
       "dependsOn": [
-        "^build"
+        "^build",
+        "^db:generate"
       ],
       "outputs": [
         ".next/**",
@@ -39,6 +40,7 @@
     },
     "lint": {},
     "dev": {
+      "dependsOn": ["^db:generate"],
       "cache": false,
       "persistent": true
     },
@@ -51,6 +53,12 @@
       "dependsOn": [
         "topo"
       ]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
     }
   },
   "globalDependencies": [

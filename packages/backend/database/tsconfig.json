@@ -1,0 +1,5 @@
+{
+  "extends": "@syntag/tsconfig/base.json",
+  "include": ["next-env.d.ts", "src/*.ts", "tsup.config.ts"],
+  "exclude": ["node_modules"]
+}
