@@ -37,6 +37,7 @@
     "@trpc/react-query": "next",
     "@trpc/server": "next",
     "@vapi-ai/web": "^1.1.3",
+    "@vercel/otel": "^1.10.0",
     "class-variance-authority": "^0.7.0",
     "clerk": "^0.8.3",
     "clsx": "^2.1.1",

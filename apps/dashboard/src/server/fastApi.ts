@@ -25,10 +25,9 @@ export function safeToString(obj: unknown): string {
   }
 }
 
-export async function toFastApiErrorResponse(
-  resjsonPromise: Promise<unknown>,
-): Promise<FastApiErrorResponse> {
-  const errorResponse: FastApiErrorResponse = await resjsonPromise
+export async function toFastApiErrorString(res: Response): Promise<string> {
+  const errorResponse: FastApiErrorResponse = await res
+    .json()
     .then((resjson) => {
       try {
         return fastApiErrorResponse.parse(resjson);
@@ -38,7 +37,7 @@ export async function toFastApiErrorResponse(
             .map((e) => `${e.path.join(".")}: ${e.message}`)
             .join(", ");
           return {
-            detail: `Error parsing: ${eStr} Actual: ${safeToString(resjson)}`,
+            detail: `Parsing: ${eStr} Actual: ${safeToString(resjson)}`,
           };
         }
         return {
@@ -46,15 +45,23 @@ export async function toFastApiErrorResponse(
         };
       }
     })
-    .catch((reason) => {
-      let details = "";
+    .catch(async (reason) => {
+      let details: string;
       try {
-        details = "Error: " + JSON.stringify(reason);
+        details = await res.text();
       } catch (e) {
-        details = "An unknown error occured";
+        if (e instanceof Error) {
+          details = e.message;
+        }
+        details = "An unknown error occured " + safeToString(reason);
       }
       return { detail: details };
     });
-
-  return errorResponse;
+  let r: string;
+  if (typeof errorResponse.detail === "string") {
+    r = `${res.status} Error: ${errorResponse.detail}`;
+  } else {
+    r = `${errorResponse.detail.statusCode} Error: ${errorResponse.detail.message} (${errorResponse.detail.error})`;
+  }
+  return r;
 }
