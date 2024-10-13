@@ -1,4 +1,0 @@
-{
-  "extends": "@syntag/tsconfig/base.json",
-  "exclude": ["node_modules"]
-}
