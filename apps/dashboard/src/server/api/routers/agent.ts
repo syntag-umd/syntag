@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { fastApiFetch } from "~/requests";
 import { type CreateAssistantDTO } from "@vapi-ai/web/api";
 import { agentSettingsFormSchema } from "~/app/_components/VoiceAgentDrawer/types";
-import { type voice_assistant } from "@prisma/client";
+import { type voice_assistant } from "@syntag/db";
 import { toFastApiErrorResponse } from "~/server/fastApi";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";

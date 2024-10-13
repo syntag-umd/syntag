@@ -9,7 +9,6 @@
     "db:studio": "prisma studio",
     "dev": "next dev",
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"
   },
