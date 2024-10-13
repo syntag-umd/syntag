@@ -73,6 +73,6 @@ export async function fastApiFetch(
   }
 
   const url = `${env.NEXT_PUBLIC_FASTAPI_BASE_URL}${path}`;
-  console.log("fetching fastapi", url);
+  console.log("fetching fastapi:", url);
   return fetch(url, init);
 }
