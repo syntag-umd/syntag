@@ -2,10 +2,14 @@ import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
 
-import { TRPCReactProvider } from "~/trpc/react";
-import { ClerkProvider } from "@clerk/nextjs";
-import MyChakraProvider from "./MyChakraProvider";
-import { ThemeProvider } from "./ThemeProvider";
+import { TRPCReactProvider } from "~/server/trpc/clients/react";
+import { ThemeProvider } from "next-themes";
+import { Provider as ClerkProvider } from "./ClerkProvider";
+import { env } from "~/env";
+import HotjarInit from "./(dashboard)/HotjarInit";
+import AnalyticsProvider from "./AnalyticsProvider";
+import ThemeConfigProvider from "./ThemeConfigProvider";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -13,7 +17,7 @@ const inter = Inter({
 
 export const metadata = {
   title: "SynTag Dashboard",
-  description: "Control your voice assistants",
+  description: "Control your receptionists",
 };
 
 export default function RootLayout({
@@ -22,11 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`font-sans ${inter.variable} bg-background text-foreground`}
-        >
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`font-sans ${inter.variable} bg-background text-foreground`}
+      >
+        <AnalyticsProvider>
+          {/* <HotjarInit /> */}
           <TRPCReactProvider>
             <ThemeProvider
               defaultTheme="system"
@@ -34,11 +39,13 @@ export default function RootLayout({
               themes={["light", "dark"]}
               attribute="data-theme"
             >
-              <MyChakraProvider>{children}</MyChakraProvider>
+              <ThemeConfigProvider>
+                <ClerkProvider>{children}</ClerkProvider>
+              </ThemeConfigProvider>
             </ThemeProvider>
           </TRPCReactProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </AnalyticsProvider>
+      </body>
+    </html>
   );
 }

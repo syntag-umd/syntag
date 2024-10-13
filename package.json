@@ -6,8 +6,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "postinstall": "prisma generate"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "workspaces": [
     "docs",
