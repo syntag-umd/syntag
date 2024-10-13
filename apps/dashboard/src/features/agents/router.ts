@@ -306,7 +306,6 @@ export const agentRouter = createTRPCRouter({
           tools: tools,
         },
         backgroundSound: "off",
-        //@ts-ignore this is correct
         modelOutputInMessagesEnabled: true,
         maxDurationSeconds: 1800,
         serverUrl: env.NEXT_PUBLIC_FASTAPI_BASE_URL + "/vapi/server-url",

@@ -7,7 +7,15 @@ export enum CALL_STATUS {
   LOADING = "loading",
 }
 
-export function useVapi(vapiAssistantId: string) {
+interface useVapiProps {
+  vapiAssistantId: string;
+  toggledLanguage?: "SPANISH" | "ENGLISH";
+}
+
+
+//TODO: Add toggled language
+
+export function useVapi(vapiAssistantId : string) {
   const [isSpeechActive, setIsSpeechActive] = useState(false);
   const [callStatus, setCallStatus] = useState<CALL_STATUS>(
     CALL_STATUS.INACTIVE,

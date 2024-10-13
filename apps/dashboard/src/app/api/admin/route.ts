@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { v4 as uuidv4 } from "uuid";
 import { env } from "~/env";
 import { expandVoiceAssistant } from "~/features/agents/server_utils";
 import { VoiceEnum, voicesRecord } from "~/features/agents/types";
 import { stripe } from "~/features/billing/stripe";
-import { deleteUser } from "~/features/user/utils";
-import { getSignedUrl } from "~/lib/gc-storage/server";
 import { getVapiAssistant } from "@syntag/vapi/server/api-utils";
 import { db } from "~/server/db";
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { CALL_STATUS, useVapi } from "@/vapi/useVapi";
+import { CALL_STATUS, useVapi } from "@syntag/vapi/web/useVapi";
 import Image from "next/image";
 
 interface Demo {
@@ -8,7 +8,7 @@ interface Demo {
 } 
 
 export default function Demo({className} : Demo) {
-    const { callStatus, toggleCall } = useVapi();
+    const { callStatus, toggleCall } = useVapi("f0e49a91-90cd-4299-96e7-9c4e87b46d6b");
 
     return (
         <div className={`w-72 h-fit bg-[color:var(--card)] text-white max-w-fit p-3 rounded-lg text-center ${className}`}>

@@ -1,5 +1,5 @@
 import { PhoneOff, PhoneOutgoing, Loader2 } from "lucide-react";
-import { CALL_STATUS, useVapi } from "@syntag/vapi/useVapi";
+import { CALL_STATUS, useVapi } from "@syntag/vapi/web/useVapi";
 
 const CallButton = ({
     toggleCall,
