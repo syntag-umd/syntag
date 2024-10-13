@@ -821,7 +821,7 @@ import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { type user } from "@prisma/client";
+import { type user } from "@syntag/db";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
   type IngestWebsitesInput,

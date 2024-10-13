@@ -1,7 +1,7 @@
 import { env } from "~/env";
 import { fastApiFetch } from "~/requests";
 import { Db } from "~/server/db";
-import { knowledge, user } from "@prisma/client";
+import { knowledge, user } from "@syntag/db";
 import { storage } from "~/lib/gc-storage/server";
 import { TRPCError } from "@trpc/server";
 import { getClientDocuments } from "./router";

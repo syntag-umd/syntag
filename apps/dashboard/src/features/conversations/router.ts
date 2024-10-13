@@ -1,4 +1,4 @@
-import { type Role, type Prisma } from "@prisma/client";
+import { type Role, type Prisma } from "@syntag/db";
 import { type inferProcedureOutput, TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, userProcedure } from "~/server/trpc/trpc";

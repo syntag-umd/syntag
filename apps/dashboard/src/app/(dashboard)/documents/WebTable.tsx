@@ -11,7 +11,7 @@ import React from "react";
 import { ClientWebsite } from "./types";
 import { api } from "~/server/trpc/clients/react";
 import "./WebTable.css";
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@syntag/db";
 
 const statusToIcon: Record<JobStatus, React.ReactNode> = {
   ENQUEUE: <Spin style={{ fontSize: "20px" }} />,

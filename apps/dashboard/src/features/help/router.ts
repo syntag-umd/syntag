@@ -1,7 +1,7 @@
 import { createTRPCRouter, userProcedure } from "~/server/trpc/trpc";
 import { z } from "zod";
 import { env } from "~/env";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@syntag/db";
 
 export const helpRouter = createTRPCRouter({
   submitRequest: userProcedure

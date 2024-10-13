@@ -1,5 +1,5 @@
 import { type CreateAssistantDTO, type Assistant } from "@vapi-ai/web/api";
-import { type Prisma, type voice_assistant } from "@prisma/client";
+import { type Prisma, type voice_assistant } from "@syntag/db";
 import { revalidatePath } from "next/cache";
 import { env } from "~/env";
 import { type inferProcedureOutput, TRPCError } from "@trpc/server";
@@ -20,7 +20,7 @@ import {
 } from "~/server/trpc/trpc";
 import { composeSystemPrompt } from "./model";
 import { expandVoiceAssistant, deleteAssistant } from "./server_utils";
-import { type JsonObject } from "@prisma/client/runtime/library";
+import { type JsonObject } from "@syntag/db/runtime/library";
 import { type VoiceAssistant } from "~/server/db";
 
 export type VoiceAssistantPhoneKnowledge = Prisma.voice_assistantGetPayload<{

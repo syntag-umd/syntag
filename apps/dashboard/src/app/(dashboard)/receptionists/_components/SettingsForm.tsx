@@ -20,7 +20,7 @@ import { api } from "~/server/trpc/clients/react";
 import { useAgent } from "../AgentContext";
 import SelectVoice from "./settings/SelectVoice";
 import { useUpdateAgent } from "./settings/updateAgentUtils";
-import { phone_number } from "@prisma/client";
+import { phone_number } from "@syntag/db";
 import { Button } from "@/components/ui/button";
 import ErrorDialog from "~/components/ErrorDialog";
 import SelectPhoneNumber from "../[agent_id]/SelectPhoneNumber";

@@ -5,7 +5,7 @@ import {
   protectedProcedure,
   userProcedure,
 } from "~/server/trpc/trpc";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@syntag/db";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { PhoneNumberBilling } from "../phone-numbers/billing";

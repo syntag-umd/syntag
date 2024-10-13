@@ -25,7 +25,7 @@ import { Textarea } from "~/components/ui/textarea";
 import ErrorDialog from "~/components/ErrorDialog";
 import SelectMemory from "./SelectMemory";
 import { Button } from "~/components/ui/button";
-import { JsonArray } from "@prisma/client/runtime/library";
+import { JsonArray } from "@syntag/db/runtime/library";
 
 export default function UpdateAgentKnowledge(props: { agent_id: string }) {
   const agentQuery = api.agent.get.useQuery(

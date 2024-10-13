@@ -1,6 +1,6 @@
 import { env } from "~/env";
 import { type Db } from "~/server/db";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@syntag/db";
 import { type DeletePhoneNumberInput } from "./router";
 import { TRPCError } from "@trpc/server";
 import { client } from "./twilio/server";

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@syntag/db";
 
 import { env } from "~/env";
 import { EmotionTags } from "~/features/agents/types";

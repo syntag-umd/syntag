@@ -34,7 +34,7 @@ import {
 } from "./types";
 import { TRPCError } from "@trpc/server";
 import { Db, db } from "~/server/db";
-import { user, type knowledge } from "@prisma/client";
+import { user, type knowledge } from "@syntag/db";
 export const SYNTAG_ADMIN_KEY_HEADER = "X-Admin-Key";
 
 export async function createWebScrapeTask(receiving_body: ReceiveWebsite) {

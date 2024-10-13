@@ -1,4 +1,4 @@
-import { JobStatus } from "@prisma/client";
+import { JobStatus } from "@syntag/db";
 
 export interface ClientFile {
   knowledge_uuid: string;

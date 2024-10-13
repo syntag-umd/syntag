@@ -2,7 +2,7 @@ import {
   type knowledge,
   type voice_assistant,
   type phone_number,
-} from "@prisma/client";
+} from "@syntag/db";
 import {
   type AzureVoice,
   type ElevenLabsVoice,
