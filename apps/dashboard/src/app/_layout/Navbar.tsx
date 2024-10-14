@@ -95,7 +95,7 @@ export default function Navbar() {
             </span>
           </div>
         }
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
       >
