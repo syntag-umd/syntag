@@ -4,15 +4,14 @@ name: Trigger auto deployment for proxy-fast-api
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ main ]
+    branches: [main]
     paths:
-    - 'apps/api-proxy/**'
-    - '.github/workflows/proxy-fast-api-AutoDeployTrigger-f157bfba-eb72-4450-a847-34529e67ed51.yml'
+      - "apps/api-proxy/**"
+      - ".github/workflows/api-proxy-AutoDeployTrigger.yml"
 
-  # Allow manual trigger 
+  # Allow manual trigger
   workflow_dispatch:
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -37,8 +36,3 @@ jobs:
           containerAppName: proxy-fast-api
           resourceGroup: syntag-resources
           imageToBuild: syntagregistryfastapi.azurecr.io/proxy-fast-api:${{ github.sha }}
-          
-            
-
-     
-
