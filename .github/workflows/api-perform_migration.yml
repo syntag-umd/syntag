@@ -33,13 +33,17 @@ jobs:
       - name: Set up cache for Poetry
         uses: actions/cache@v2
         with:
-          path: ~/.cache/pypoetry
+          path: |
+            ~/.cache/pypoetry
+            apps/api/.venv
           key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
+        working-directory: apps/api
         run: poetry install --no-interaction
 
       - name: Upgrade database to head
+        working-directory: apps/api
         run: |
           source .venv/bin/activate
           alembic upgrade head
