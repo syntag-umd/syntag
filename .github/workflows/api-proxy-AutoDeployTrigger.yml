@@ -7,7 +7,7 @@ on:
     branches: [main]
     paths:
       - "apps/api-proxy/**"
-      - ".github/workflows/proxy-fast-api-AutoDeployTrigger-f157bfba-eb72-4450-a847-34529e67ed51.yml"
+      - ".github/workflows/api-proxy-AutoDeployTrigger.yml"
 
   # Allow manual trigger
   workflow_dispatch:
