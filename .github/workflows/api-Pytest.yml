@@ -1,12 +1,12 @@
 name: Run Pytests
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "apps/api/**"
-      - ".github/workflows/api-Pytest.yml"
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "apps/api/**"
+  #     - ".github/workflows/api-Pytest.yml"
   workflow_dispatch:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1

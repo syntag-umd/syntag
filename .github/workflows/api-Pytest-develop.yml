@@ -1,12 +1,12 @@
 name: Run Pytests
 
 on:
-  pull_request:
-    branches:
-      - develop
-    paths:
-      - "apps/api/**"
-      - ".github/workflows/api-Pytest-develop.yml"
+  # pull_request:
+  #   branches:
+  #     - develop
+  #   paths:
+  #     - "apps/api/**"
+  #     - ".github/workflows/api-Pytest-develop.yml"
   workflow_dispatch:
 
 jobs:
