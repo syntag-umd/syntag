@@ -1,45 +1,34 @@
-import { useEffect, useState } from "react";
-import {
-  Message,
-  MessageTypeEnum,
-  TranscriptMessage,
-  TranscriptMessageTypeEnum,
-} from "./types";
-import vapi from "./vapi";
+import { useEffect, useState } from 'react';
+import { Message, MessageTypeEnum, TranscriptMessage, TranscriptMessageTypeEnum } from './types';
+import vapi from './vapi';
 
 export enum CALL_STATUS {
-  INACTIVE = "inactive",
-  ACTIVE = "active",
-  LOADING = "loading",
+  INACTIVE = 'inactive',
+  ACTIVE = 'active',
+  LOADING = 'loading',
 }
 
 export function useVapi() {
-  const [callStatus, setCallStatus] = useState<CALL_STATUS>(
-    CALL_STATUS.INACTIVE,
-  );
+  const [callStatus, setCallStatus] = useState<CALL_STATUS>(CALL_STATUS.INACTIVE);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const [activeTranscript, setActiveTranscript] =
-    useState<TranscriptMessage | null>(null);
+  const [activeTranscript, setActiveTranscript] = useState<TranscriptMessage | null>(null);
 
   useEffect(() => {
     const onCallStartHandler = () => {
-      console.log("Call has started");
+      console.log('Call has started');
       setCallStatus(CALL_STATUS.ACTIVE);
     };
 
     const onCallEnd = () => {
-      console.log("call has ended ok");
-      console.log("Call has stopped");
+      console.log('call has ended ok');
+      console.log('Call has stopped');
       setCallStatus(CALL_STATUS.INACTIVE);
     };
 
     const onMessageUpdate = (message: Message) => {
-      console.log("message", message);
-      if (
-        message.type === MessageTypeEnum.TRANSCRIPT &&
-        message.transcriptType === TranscriptMessageTypeEnum.PARTIAL
-      ) {
+      console.log('message', message);
+      if (message.type === MessageTypeEnum.TRANSCRIPT && message.transcriptType === TranscriptMessageTypeEnum.PARTIAL) {
         setActiveTranscript(message);
       } else {
         setMessages((prev) => [...prev, message]);
@@ -48,32 +37,33 @@ export function useVapi() {
     };
 
     const onError = (e: any) => {
-      console.log("on error triggered");
+      console.log('on error triggered');
       setCallStatus(CALL_STATUS.INACTIVE);
       console.error(e);
     };
 
-    vapi.on("call-start", onCallStartHandler);
-    vapi.on("call-end", onCallEnd);
-    vapi.on("message", onMessageUpdate);
-    vapi.on("error", onError);
+    vapi.on('call-start', onCallStartHandler);
+    vapi.on('call-end', onCallEnd);
+    vapi.on('message', onMessageUpdate);
+    vapi.on('error', onError);
 
     return () => {
-      vapi.off("call-start", onCallStartHandler);
-      vapi.off("call-end", onCallEnd);
-      vapi.off("message", onMessageUpdate);
-      vapi.off("error", onError);
+      vapi.off('call-start', onCallStartHandler);
+      vapi.off('call-end', onCallEnd);
+      vapi.off('message', onMessageUpdate);
+      vapi.off('error', onError);
     };
   }, []);
 
   const start = async () => {
-    console.log("starting the call");
+    console.log('starting the call');
     setCallStatus(CALL_STATUS.LOADING);
-    const response = vapi.start("f0e49a91-90cd-4299-96e7-9c4e87b46d6b");
+    const response = vapi.start('f0e49a91-90cd-4299-96e7-9c4e87b46d6b');
 
-    response.catch((e) => {
-      console.error("got an error while starting the call", e);
-    });
+    response
+      .catch((e) => {
+        console.error('got an error while starting the call', e);
+      });
   };
 
   const stop = () => {
@@ -83,7 +73,7 @@ export function useVapi() {
 
   const toggleCall = async () => {
     if (callStatus === CALL_STATUS.ACTIVE) {
-      console.log("stopping the call");
+      console.log('stopping the call');
       stop();
     } else {
       await start();
@@ -91,7 +81,7 @@ export function useVapi() {
   };
 
   const setMuted = (value: boolean) => {
-    console.log("mute");
+    console.log('mute');
     vapi.setMuted(value);
   };
   const isMuted = vapi.isMuted;

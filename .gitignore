@@ -13,7 +13,6 @@ build/**
 *.local
 # keeps the file type
 *.local.*
-.env*.local
 
 
 ## FROM api-proxy
@@ -45,30 +44,27 @@ wheels/
 .venv/
 venv/
 
+# secret keys
+#.env
+#*.env
+#.env.*
+.env*.local
+
+
 # Coverage reports
 htmlcov/
 .coverage
 .coverage.*
 
 # Log files
-logs
 *.log
 
 # Temporary files
 *.tmp
+
 .DS_Store
+
 node_modules/
 
-# api-proxy files
 *.zip
-
-# Node modules
-**/node_modules
-
-# Next.js build output
-**/.next
-
-# Other build output directories
-**/dist
-**/build
-**/out
+## END api-proxy

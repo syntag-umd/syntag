@@ -9,9 +9,8 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
-export const db =
-  globalForPrisma.prisma ?? (createPrismaClient() as PrismaClient);
+export const db = globalForPrisma.prisma ?? createPrismaClient() as PrismaClient;
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
 
-export * from "@prisma/client";
+export * from '@prisma/client';

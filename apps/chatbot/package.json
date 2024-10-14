@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "preinstall": "npx only-allow pnpm",
+    "postinstall": "prisma generate",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {

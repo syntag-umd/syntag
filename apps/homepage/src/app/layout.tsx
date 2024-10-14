@@ -15,8 +15,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "SynTag | AI Receptionists made easy",
-  description:
-    "Create AI Receptionists that are reliable and accurate for your business",
+  description: "Create AI Receptionists that are reliable and accurate for your business",
 };
 
 export default function RootLayout({

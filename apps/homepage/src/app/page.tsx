@@ -8,12 +8,12 @@ export default function Home() {
   return (
     <div className="font-[family-name:var(--font-geist-sans)] m-auto px-0 md:px-10 max-w-[1500px]">
       <main className="mx-5 sm:mx-10">
-        <Navbar />
-        <Hero />
-        <Setup />
-        <Pricing />
+        <Navbar/>
+        <Hero/>
+        <Setup/>
+        <Pricing/>
       </main>
-      <Footer />
+      <Footer/>
     </div>
   );
 }

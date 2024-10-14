@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { Box, Text } from "@chakra-ui/react";
 import Highlight, { defaultProps, Language } from "prism-react-renderer";
 import theme from "prism-react-renderer/themes/nightOwl";
@@ -11,14 +11,8 @@ interface PrismHighlightProps {
   language: Language;
 }
 
-const PrismHighlight = ({
-  code,
-  language,
-}: {
-  code: string;
-  language: Language;
-}) => (
-  <Highlight {...defaultProps} theme={theme} code={code} language={language}>
+const PrismHighlight = ({ code, language }:{ code: string; language: Language }) => (
+  <Highlight {...defaultProps} theme={theme} code={code} language={language} >
     {({ className, style, tokens, getLineProps, getTokenProps }) => (
       <Text
         as="pre"
