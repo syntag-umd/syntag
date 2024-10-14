@@ -27,7 +27,9 @@ export default function FileUpload(props: {
     defaultValues: { files: [] },
   });
 
-  const onSubmit: SubmitHandler<UploadFileForm> = async (data: UploadFileForm) => {
+  const onSubmit: SubmitHandler<UploadFileForm> = async (
+    data: UploadFileForm,
+  ) => {
     setLoading(true);
     try {
       const formData = new FormData();

@@ -30,7 +30,6 @@ import { FaRegStar, FaStar } from "react-icons/fa";
 
 export type Icon = LucideIcon;
 
-
 export const Icons = {
   dashboard: LayoutDashboardIcon,
   analytics: BarChart3Icon,

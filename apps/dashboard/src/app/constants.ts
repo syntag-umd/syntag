@@ -1,5 +1,5 @@
 import { type NavItem } from "./_layout/types";
-export const MAIN_ID = "main-container-id"
+export const MAIN_ID = "main-container-id";
 
 export const navItems: NavItem[] = [
   {
@@ -33,4 +33,3 @@ export const navItems: NavItem[] = [
     label: "settings",
   },
 ];
-

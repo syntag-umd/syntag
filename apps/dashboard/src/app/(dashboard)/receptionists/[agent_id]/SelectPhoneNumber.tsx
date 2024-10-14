@@ -22,7 +22,7 @@ export default function SelectPhoneNumber(props: {
   useEffect(() => {
     setCurrentPhoneNumberUuid(props.uuidOfExistingNumber);
   }, [props.uuidOfExistingNumber]);
-  
+
   const router = useRouter();
   const [openSelect, setOpenSelect] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);

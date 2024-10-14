@@ -1,6 +1,9 @@
 import { type Prisma } from "@syntag/db";
 import { env } from "~/env";
-import { getVapiAssistant, parseVapiAssistant } from "@syntag/vapi/server/api-utils";
+import {
+  getVapiAssistant,
+  parseVapiAssistant,
+} from "@syntag/vapi/server/api-utils";
 import { type Model, modelSchema, type VoiceAssistantExpanded } from "./types";
 import { type VoiceAssistantPhoneKnowledge } from "./router";
 import { type Assistant } from "@vapi-ai/web/api";

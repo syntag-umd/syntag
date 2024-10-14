@@ -199,4 +199,3 @@ export function parseVapiAssistant(
     voice_config: voice_config,
   };
 }
-

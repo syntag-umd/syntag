@@ -30,11 +30,11 @@ export default function Navbar() {
 
   const submitRequestQuery = api.help.submitRequest.useMutation();
 
-  const handleSubmit = async (values: {problem: string}) => {
-
+  const handleSubmit = async (values: { problem: string }) => {
     const { problem } = values;
 
-    await submitRequestQuery.mutateAsync({ problem },
+    await submitRequestQuery.mutateAsync(
+      { problem },
       {
         onSuccess: () => {
           void message.success("Request submitted successfully");
@@ -42,20 +42,18 @@ export default function Navbar() {
         onError: (error: { message: string }) => {
           void message.error(error.message);
         },
-      }
+      },
     );
 
-  
     handleCancel(); // Close modal after submission
   };
-  
 
   return (
-    <nav className="flex justify-between h-navbar-height items-center pl-4 pr-6">
+    <nav className="flex h-navbar-height items-center justify-between pl-4 pr-6">
       <div className={cn("block md:!hidden")}>
         <MobileSidebar />
       </div>
-      <div className="flex items-center gap-4 ml-auto p-4 text-muted-foreground">
+      <div className="ml-auto flex items-center gap-4 p-4 text-muted-foreground">
         <Link
           href="https://calendly.com/vikram-from-syntag/30min"
           target="_blank"
@@ -64,7 +62,7 @@ export default function Navbar() {
           Contact Sales
         </Link>
         <Button type="link" size="large" onClick={showModal}>
-          <div className="text-muted-foreground" >Help</div>
+          <div className="text-muted-foreground">Help</div>
         </Button>
         <Button
           onClick={() => {
@@ -88,11 +86,13 @@ export default function Navbar() {
 
       {/* Help Modal */}
       <Modal
-        title={<div style={{marginBottom: "1rem"}}>
-          <div className="text-xl">
-            Submit a help request
-          </div>
-          <span className="text-muted-foreground font-normal text-sm">Experiencing issues? Submit a help request and a member of our team will get back to you in 24 hours.</span>
+        title={
+          <div style={{ marginBottom: "1rem" }}>
+            <div className="text-xl">Submit a help request</div>
+            <span className="text-sm font-normal text-muted-foreground">
+              Experiencing issues? Submit a help request and a member of our
+              team will get back to you in 24 hours.
+            </span>
           </div>
         }
         visible={isModalVisible}
@@ -103,7 +103,9 @@ export default function Navbar() {
           <Form.Item
             label="Problem"
             name="problem"
-            rules={[{ required: true, message: "Please describe your problem" }]}
+            rules={[
+              { required: true, message: "Please describe your problem" },
+            ]}
           >
             <Input.TextArea rows={4} placeholder="Describe your issue" />
           </Form.Item>

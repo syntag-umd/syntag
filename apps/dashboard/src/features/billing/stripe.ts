@@ -18,4 +18,3 @@ export async function createStripeCustomer(
   });
   return stripe_customer;
 }
-

@@ -7,8 +7,6 @@ import styled from "@emotion/styled";
  * is(&) -> increases specificity and precedence
  */
 export const StyledTabs = styled(Tabs)`
-
-
   & .ant-tabs-nav::before {
     border-color: var(--primary);
   }

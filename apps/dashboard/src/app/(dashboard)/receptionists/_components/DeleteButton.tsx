@@ -49,15 +49,12 @@ function DeleteAgent(props: {
     }
   };
 
-
   return (
     <>
       <ErrorDialog setError={setError} error={error} />
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogTrigger>
-          <div style={{ display: 'inline-block' }}>
-          {props.button}
-          </div>
+          <div style={{ display: "inline-block" }}>{props.button}</div>
         </AlertDialogTrigger>
         <AlertDialogContent className="border-input">
           <AlertDialogHeader>

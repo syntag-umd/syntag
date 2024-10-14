@@ -18,12 +18,12 @@ export type Db = typeof db;
 
 if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
 export interface PromptComponents {
-  websiteSummary?: string
-  instructions?: string
-  knowledge?: string
-  emotionTags?: EmotionTags
+  websiteSummary?: string;
+  instructions?: string;
+  knowledge?: string;
+  emotionTags?: EmotionTags;
 }
 
 export interface VoiceAssistant {
-  prompt_components: PromptComponents
+  prompt_components: PromptComponents;
 }
