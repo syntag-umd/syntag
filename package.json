@@ -9,11 +9,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "workspaces": [
-    "docs",
     "apps/*",
     "packages/*",
-    "assets",
-    "tools"
+    "scripts/*",
+    "assets"
   ],
   "devDependencies": {
     "@syntag/tsconfig": "workspace:*",
