@@ -1,46 +1,44 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import {
-  NextResponse,
-} from "next/server";
+import { NextResponse } from "next/server";
+import { env } from "./env";
+import { getActualAuth } from "./app/(auth)/utils";
 
 const isClerkProtected = createRouteMatcher([
-  "/((?!onboarding|_next/static|_next/image|sign-in|sign-up|monitoring|icon).*)",
+  "/((?!_next/static|_next/image|share|sign-in|sign-up|onboarding|monitoring|icon|api).*)",
 ]);
 
-export default clerkMiddleware(async (auth, request, event) => {
-  /* 
-  console.log(request);
-  console.log("====================================");
-  console.log(request.nextUrl);
-  console.log("===================================="); 
-  */
-
+export default clerkMiddleware(async (auth, request) => {
   if (!isClerkProtected(request)) {
-    if (request.nextUrl.pathname.startsWith("/onboarding")) {
-      const sessionClaims = auth().sessionClaims as CustomJwtSessionClaims;
-      if (sessionClaims.external_id) {
-        return NextResponse.redirect(new URL("/", request.url));
+    const sessionClaims = auth().sessionClaims as CustomJwtSessionClaims | null;
+    if (
+      request.nextUrl.pathname.startsWith("/onboarding") ||
+      request.nextUrl.pathname.startsWith("/sign-in") ||
+      request.nextUrl.pathname.startsWith("/sign-up")
+    ) {
+      if (sessionClaims?.external_id) {
+        return NextResponse.redirect(
+          new URL(
+            env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL,
+            request.url,
+          ),
+        );
       }
       return NextResponse.next();
     }
     return NextResponse.next();
   }
-
-  const sessionClaims = auth().sessionClaims as CustomJwtSessionClaims | null;
-  if (!sessionClaims) {
+  const actualAuth = await getActualAuth(auth());
+  if (!actualAuth.userId) {
     auth().protect();
-    auth().redirectToSignIn();
     return NextResponse.redirect(new URL("/onboarding", request.url));
   }
-  if (!sessionClaims.external_id) {
+  if (actualAuth.sessionClaims.external_id) {
+    return NextResponse.next();
+  } else {
     return NextResponse.redirect(new URL("/onboarding", request.url));
   }
-  auth().protect();
-  return NextResponse.next();
 });
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|sign-in|sign-up|monitoring|icon).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|monitoring|icon).*)"],
 };

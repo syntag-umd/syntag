@@ -9,4 +9,66 @@ build/**
 
 # env
 .env
-.env.local
+# any file extension that ends with this is ignored
+*.local
+# keeps the file type
+*.local.*
+.env*.local
+
+
+## FROM api-proxy
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+wheels/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# pytest cache
+.pytest_cache/
+
+# PyCharm and VS Code settings
+.idea/
+.vscode/
+
+# Virtual environment
+.venv/
+venv/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Log files
+logs
+*.log
+
+# Temporary files
+*.tmp
+.DS_Store
+node_modules/
+
+# api-proxy files
+*.zip
+
+# Node modules
+**/node_modules
+
+# Next.js build output
+**/.next
+
+# Other build output directories
+**/dist
+**/build
+**/out

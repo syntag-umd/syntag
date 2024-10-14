@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Stack, Avatar, Text, AvatarBadge } from '@chakra-ui/react';
 import ChatMessage from './ChatMessage';
 import ResolutionModal from './ResolutionModal';
-import { CALL_STATUS, useVapi } from '@syntag/vapi/useVapi';
+import { CALL_STATUS, useVapi } from '@syntag/vapi/web/useVapi';
 import CallButton from './CallButton';
 
 
@@ -24,7 +24,8 @@ const AIChatBox = ({ open, onClose }: AIChatBoxProps) => {
   const [id, setId] = useState<string>("");
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat();
-  const { toggleCall, callStatus } = useVapi({toggledLanguage});
+  // const { toggleCall, callStatus } = useVapi({toggledLanguage});
+  const { toggleCall, callStatus } = useVapi("f0e49a91-90cd-4299-96e7-9c4e87b46d6b");
 
   const [modal, setModal] = useState<boolean>(false);
 

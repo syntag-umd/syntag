@@ -1,0 +1,38 @@
+/* web-table.css */
+
+.web-table .actions-container {
+    display: flex;
+    align-items: center;
+}
+
+.web-table .desktop-actions {
+    display: flex;
+}
+
+.web-table .mobile-actions {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .web-table .desktop-actions {
+        display: none;
+    }
+
+    .web-table .mobile-actions {
+        display: flex;
+    }
+}
+
+/* WebTable.css */
+
+/* Default width for larger screens */
+.actions-column {
+    width: 100px;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .actions-column {
+        width: 50px;
+    }
+}

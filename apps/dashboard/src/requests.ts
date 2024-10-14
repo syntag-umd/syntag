@@ -52,19 +52,28 @@ export async function mutate(url: string, body: string) {
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
 const path_fetch = z.string().startsWith("/");
 
 export async function fastApiFetch(
   path: z.infer<typeof path_fetch>,
-  token: string,
   init?: RequestInit,
+  keys?: {
+    token?: string;
+    userApiKey?: string;
+  },
 ) {
   if (!init) {
     init = {};
   }
 
   const headers = new Headers(init.headers);
-  headers.append("X-CLERK-JWT", token);
+  if (keys?.userApiKey) {
+    headers.append("X-API-Key", keys.userApiKey);
+  }
+  if (keys?.token) {
+    headers.append("X-CLERK-JWT", keys.token);
+  }
 
   init.headers = headers;
   /* fastAPI can not read body if this is not set */
