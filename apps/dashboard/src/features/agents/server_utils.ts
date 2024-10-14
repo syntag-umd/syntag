@@ -4,8 +4,8 @@ import { getVapiAssistant, parseVapiAssistant } from "@syntag/vapi/server/api-ut
 import { type Model, modelSchema, type VoiceAssistantExpanded } from "./types";
 import { type VoiceAssistantPhoneKnowledge } from "./router";
 import { type Assistant } from "@vapi-ai/web/api";
-import { PrismaClientKnownRequestError } from "@syntag/db/runtime/library";
 import { type VoiceAssistant } from "~/server/db";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function expandVoiceAssistant(
   db_assistant: VoiceAssistantPhoneKnowledge,

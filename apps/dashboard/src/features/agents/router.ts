@@ -20,7 +20,7 @@ import {
 } from "~/server/trpc/trpc";
 import { composeSystemPrompt } from "./model";
 import { expandVoiceAssistant, deleteAssistant } from "./server_utils";
-import { type JsonObject } from "@syntag/db/runtime/library";
+import { type JsonObject } from "@prisma/client/runtime/library";
 import { type VoiceAssistant } from "~/server/db";
 
 export type VoiceAssistantPhoneKnowledge = Prisma.voice_assistantGetPayload<{
