@@ -1,0 +1,30 @@
+repos:
+  - repo: local
+    hooks:
+      - id: update-requirements
+        name: Update requirements.txt
+        entry: bash -c 'poetry run poetry export --without-hashes > requirements.txt && git add requirements.txt'
+        language: system
+        types: [file]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1  # Make sure to use the latest revision
+    hooks:
+      - id: trailing-whitespace
+      - id: check-xml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.0  # Use the latest version
+    hooks:
+      - id: black
+        language_version: python3.9  # Specify your Python version
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.2  # Use the latest version
+    hooks:
+      - id: flake8
+        args:
+          - --ignore=E501,W503,F811
