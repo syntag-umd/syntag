@@ -63,5 +63,6 @@
   },
   "globalDependencies": [
     ".env"
-  ]
+  ],
+  "ui": "tui"
 }
