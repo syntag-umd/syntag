@@ -71,6 +71,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(project_root, ".env.development"),
+        extra="ignore",
     )
 
     def __init__(self) -> None:

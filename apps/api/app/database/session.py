@@ -52,4 +52,5 @@ from app.database.tables import (  # noqa: F401, E402
     assistants_to_knowledge,
     chunks,
     user_journal_entry,
+    manual_call_transcription
 )
