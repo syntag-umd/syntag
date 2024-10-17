@@ -124,7 +124,7 @@ async def process_transcript_with_openai(transcription_text):
     )
 
     response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
+        model='gpt-4o-mini',
         messages=[
             {'role': 'system', 'content': system_prompt},
             {'role': 'user', 'content': "Transcript: " + transcription_text + "\nMessages: "}
