@@ -128,8 +128,8 @@ async def recording_completed(
     transcription = ManualCallTranscription(
         call_sid=CallSid,
         recording_sid=RecordingSid,
-        caller_number=From_,
-        called_number=To_,
+        caller_phone_number=From_,
+        called_phone_number=To_,
         messages={'messages': messages}
     )
     db.add(transcription)
