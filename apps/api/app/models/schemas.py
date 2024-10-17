@@ -125,3 +125,12 @@ class AppointmentBookingRequest(BaseModel):
     lastName: str
     email: EmailStr
     phoneNumber: str
+
+
+class ManualCallTranscriptionMessage(BaseModel):
+    role: Literal["receptionist", "customer"]
+    content: str
+
+class ManualCallTranscriptionContent(BaseModel):
+    messages: List[ManualCallTranscriptionMessage]
+    
