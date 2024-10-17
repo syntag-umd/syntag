@@ -14,7 +14,14 @@ import requests
 from requests.auth import HTTPBasicAuth
 from google.cloud import speech_v1p1beta1 as speech
 
-api_domain = "https://syntag.loca.lt"
+environment = settings.ENVIRONMENT
+
+if environment == 'production':
+    api_domain = 'https://api.syntag.ai'
+elif environment == 'development':
+    api_domain = 'https://develop-api.syntag.ai'
+else:
+    api_domain = 'http://localhost:8000'
 
 account_sid = settings.TWILIO_ACCOUNT_SID
 auth_token = settings.TWILIO_AUTH_TOKEN
@@ -66,6 +73,8 @@ async def recording_completed(
     RecordingSid: str = Form(...),
     RecordingUrl: str = Form(...),
     CallSid: str = Form(...),
+    From_: str = Form(..., alias='From'),
+    To_: str = Form(..., alias='To'),
     db: Session = Depends(get_db)
 ):
     """Handle recording status callbacks and process transcription with Google Speech-to-Text."""
@@ -83,7 +92,6 @@ async def recording_completed(
 
     # Initialize Google Cloud Speech client with credentials
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
 
     service_account_file = os.path.join(project_root, 'routes/record_call/service-account-file.json')
     credentials = service_account.Credentials.from_service_account_file(
@@ -114,6 +122,8 @@ async def recording_completed(
     transcription = ManualCallTranscription(
         call_sid=CallSid,
         recording_sid=RecordingSid,
+        caller_number=From_,
+        called_number=To_,
         messages={'messages': messages}
     )
     db.add(transcription)
@@ -121,6 +131,7 @@ async def recording_completed(
     db.close()
 
     return Response(content='Recording processed and transcription saved', media_type='text/plain')
+
 
 def process_transcript(response):
     """Process the transcription response and format messages with speaker roles."""
