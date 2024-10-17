@@ -73,10 +73,16 @@ async def recording_completed(
     RecordingSid: str = Form(...),
     RecordingUrl: str = Form(...),
     CallSid: str = Form(...),
-    From_: str = Form(..., alias='From'),
-    To_: str = Form(..., alias='To'),
     db: Session = Depends(get_db)
 ):
+    
+    # Get the call object
+    call = client.calls(CallSid).fetch()
+    
+    # Get the call details
+    From_ = call.from_
+    To_ = call.to
+    
     """Handle recording status callbacks and process transcription with Google Speech-to-Text."""
     await validate_twilio_request(request)
 
