@@ -17,7 +17,6 @@ class ManualCallTranscription(Base):
     uuid: UUID = Column(UUID, nullable=False, unique=True, server_default=text("gen_random_uuid()"), index=True)
     call_sid: str = Column(String, index=True)
     recording_sid: str = Column(String)
-    transcription_sid: str = Column(String)
     messages: ManualCallTranscriptionContent = Column(JSON)  # Store messages as JSON
     caller_phone_number: str = Column(String)
     called_phone_number: str = Column(String)

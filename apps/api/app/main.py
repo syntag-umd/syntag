@@ -19,6 +19,7 @@ from app.routes.billing.route import router as billing_router
 from app.utils import format_error_message
 from app.routes.test import router as test_router
 from app.routes.squire.route import router as squire_router
+from app.routes.record_call.route import router as record_call_router
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exception_handlers import (
     http_exception_handler,
@@ -88,6 +89,7 @@ def create_app() -> FastAPI:
     app.include_router(billing_router, tags=["Billing"])
     app.include_router(test_router, tags=["Test performance"])
     app.include_router(squire_router, tags=["Squire"])
+    app.include_router(record_call_router, tags=["Record Call"])
     app.openapi_version = "3.0.0"
 
     @app.on_event("startup")
