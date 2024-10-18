@@ -75,8 +75,12 @@ async def voice(request: Request):
     dial = Dial(
         record='record-from-answer',
         recording_status_callback=api_domain + '/record-call/recording-completed',
-        recording_status_callback_method='POST', action='/record-call/dial-status', method='POST'
+        recording_status_callback_method='POST', 
+        action='/record-call/dial-status', 
+        method='POST',
+        answerOnBridge=True  # This line ensures the call is only "answered" when the recipient picks up
     )
+
 
     dial.number(recipient_number) 
     response.append(dial)
