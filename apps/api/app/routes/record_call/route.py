@@ -132,7 +132,9 @@ async def store_transcription(
     From_: str,
     To_: str,
     messages: list,
-    voicemail: bool
+    voicemail: bool,
+    recording_url: str,
+    call_duration: float  # Accept call duration as a float
 ):
     """Helper function to store the transcription in the database."""
     transcription = ManualCallTranscription(
@@ -141,10 +143,13 @@ async def store_transcription(
         caller_phone_number=From_,
         called_phone_number=To_,
         messages={'messages': messages},
-        voicemail=voicemail
+        voicemail=voicemail,
+        recording_url=recording_url,  # Store the recording URL
+        call_duration=call_duration  # Store the call duration
     )
     db.add(transcription)
     db.commit()
+
     
 async def transcribe_recording(RecordingUrl: str, RecordingSid: str) -> str:
     
@@ -216,20 +221,20 @@ async def transcribe_recording(RecordingUrl: str, RecordingSid: str) -> str:
 
 
 @router.post("/voicemail-transcribed")
-async def voicemail_completed(
+async def voicemail_transcribed(
     request: Request,
     RecordingSid: str = Form(...),
     RecordingUrl: str = Form(...),
     CallSid: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Handle the voicemail after it's recorded."""
     await validate_twilio_request(request)
     
     # Fetch the call details from Twilio
     call = client.calls(CallSid).fetch()
     From_ = call.from_formatted
     To_ = call.to_formatted
+    call_duration = call.duration  # Fetch call duration in seconds
 
     # Transcribe the voicemail
     transcript = await transcribe_recording(RecordingUrl, RecordingSid)
@@ -237,10 +242,14 @@ async def voicemail_completed(
     # Process the transcription text into messages
     messages = [{"role": "customer", "content": transcript}]
     
-    # Store the transcription
-    await store_transcription(db, CallSid, RecordingSid, From_, To_, messages, voicemail=True)
+    # Store the transcription along with the recording URL and call duration
+    await store_transcription(
+        db, CallSid, RecordingSid, From_, To_, messages, voicemail=True, 
+        recording_url=RecordingUrl, call_duration=float(call_duration)
+    )
     
     return Response(content="Voicemail received and transcribed.", media_type='text/plain')
+
 
 
 
@@ -258,6 +267,7 @@ async def recording_completed(
     call = client.calls(CallSid).fetch()
     From_ = call.from_formatted
     To_ = call.to_formatted
+    call_duration = call.duration  # Fetch call duration in seconds
 
     # Transcribe the recording
     transcript = await transcribe_recording(RecordingUrl, RecordingSid)
@@ -265,8 +275,11 @@ async def recording_completed(
     # Process the transcription text into messages
     messages = await process_transcript_with_openai(transcript)
 
-    # Store the transcription
-    await store_transcription(db, CallSid, RecordingSid, From_, To_, messages, voicemail=False)
+    # Store the transcription along with the recording URL and call duration
+    await store_transcription(
+        db, CallSid, RecordingSid, From_, To_, messages, voicemail=False, 
+        recording_url=RecordingUrl, call_duration=float(call_duration)
+    )
 
     return Response(content='Recording processed, transcription saved, and audio file deleted from GCS', media_type='text/plain')
 
