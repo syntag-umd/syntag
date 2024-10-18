@@ -75,11 +75,28 @@ async def voice(request: Request):
     dial = Dial(
         record='record-from-answer',
         recording_status_callback=api_domain + '/record-call/recording-completed',
-        recording_status_callback_method='POST'
+        recording_status_callback_method='POST', action='/record-call/dial-status', method='POST'
     )
 
-    dial.number(recipient_number, action='/record-call/voicemail', method='POST') 
+    dial.number(recipient_number) 
     response.append(dial)
+
+    return Response(content=str(response), media_type='application/xml')
+
+@router.api_route("/dial-status", methods=["GET", "POST"])
+async def dial_status(request: Request):
+    """Handle the status after the Dial verb completes."""
+    await validate_twilio_request(request)
+    params = await request.form()
+    dial_call_status = params.get('DialCallStatus')
+
+    response = VoiceResponse()
+    if dial_call_status in ['no-answer', 'busy', 'failed', 'canceled']:
+        # The call was not answered, proceed to voicemail
+        response.redirect('/record-call/voicemail', method='POST')
+    else:
+        # Call was answered and completed, end the call
+        response.hangup()
 
     return Response(content=str(response), media_type='application/xml')
 
