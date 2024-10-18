@@ -4,7 +4,7 @@ from datetime import datetime
 
 from app.models.schemas import ManualCallTranscriptionContent
 
-from sqlalchemy import UUID, Column, Integer, text, String, DateTime
+from sqlalchemy import UUID, Column, Integer, text, String, DateTime, Boolean
 from sqlalchemy.dialects.postgresql import JSON
 
 from app.database.session import Base
@@ -21,3 +21,4 @@ class ManualCallTranscription(Base):
     caller_phone_number: str = Column(String)
     called_phone_number: str = Column(String)
     timestamp: datetime = Column(DateTime, default=datetime.utcnow)
+    voicemail: bool = Column(Boolean, default=False)
