@@ -24,4 +24,4 @@ class ManualCallTranscription(Base):
     voicemail: bool = Column(Boolean, default=False)
     recording_url: str = Column(String)
     call_duration_seconds: int = Column(Integer)
-    appointment_booked: bool = Column(Boolean, default=False)
+    appointment_booked: bool = Column(Boolean, default=False, nullable=False)
