@@ -1,22 +1,25 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import type { InputRef } from 'antd';
-import { Input, Tag, theme } from 'antd';
+import React, { useEffect, useRef, useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
+import type { InputRef } from "antd";
+import { Input, Tag, theme } from "antd";
 
 type TagComponentProps = {
-    emotionTags: string[],
-    onChange: (tags: string[]) => any,
-    style?: React.CSSProperties,
+  emotionTags: string[];
+  onChange: (tags: string[]) => any;
+  style?: React.CSSProperties;
 };
 
-const TagComponent: React.FC<TagComponentProps> = ({emotionTags, onChange: handleEmotionTagChange, style}) => {
-
+const TagComponent: React.FC<TagComponentProps> = ({
+  emotionTags,
+  onChange: handleEmotionTagChange,
+  style,
+}) => {
   const { token } = theme.useToken();
   const [tags, setTags] = useState(emotionTags);
   const [inputVisible, setInputVisible] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<InputRef>(null);
 
   useEffect(() => {
@@ -45,11 +48,11 @@ const TagComponent: React.FC<TagComponentProps> = ({emotionTags, onChange: handl
       handleEmotionTagChange([...tags, inputValue]);
     }
     setInputVisible(false);
-    setInputValue('');
+    setInputValue("");
   };
 
   const forMap = (tag: string) => (
-    <span key={tag} style={{ display: 'inline-block' }}>
+    <span key={tag} style={{ display: "inline-block" }}>
       <Tag
         closable
         onClose={(e) => {
@@ -66,31 +69,30 @@ const TagComponent: React.FC<TagComponentProps> = ({emotionTags, onChange: handl
 
   const tagPlusStyle: React.CSSProperties = {
     background: token.colorBgContainer,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
   };
 
   return (
     <>
       <div style={style}>
-      {tagChild}
-      {inputVisible ? (
-        <Input
-          ref={inputRef}
-          type="text"
-          size="small"
-          style={{ width: 78 }}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputConfirm}
-          onPressEnter={handleInputConfirm}
-        />
-      ) : (
-        <Tag onClick={showInput} style={tagPlusStyle}>
-          <PlusOutlined /> New Tag
-        </Tag>
-      )}
-            </div>
-
+        {tagChild}
+        {inputVisible ? (
+          <Input
+            ref={inputRef}
+            type="text"
+            size="small"
+            style={{ width: 78 }}
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputConfirm}
+            onPressEnter={handleInputConfirm}
+          />
+        ) : (
+          <Tag onClick={showInput} style={tagPlusStyle}>
+            <PlusOutlined /> New Tag
+          </Tag>
+        )}
+      </div>
     </>
   );
 };

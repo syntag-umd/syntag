@@ -59,8 +59,57 @@ logs
 .DS_Store
 node_modules/
 
-# api-proxy files
+# ==START FASTAPI==
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+wheels/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# pytest cache
+.pytest_cache/
+
+# PyCharm and VS Code settings
+.idea/
+.vscode/
+
+# Virtual environment
+.venv/
+venv/
+
+# secret keys
+#.env
+#*.env
+#.env.*
+.env*.local
+
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+
+.DS_Store
+
 *.zip
+# ==END FASTAPI==
 
 # Node modules
 **/node_modules

@@ -7,12 +7,10 @@ export default async function page() {
   const assistants_overviews = await api.agent.getOverview();
   return (
     <>
-      <div className="flex justify-between mb-5">
+      <div className="mb-5 flex justify-between">
         <div>
           <h1 className="mb-2 text-4xl font-bold">AI Receptionists</h1>
-          <p className="mb-6 opacity-75">
-            Configure custom AI Receptionists
-          </p>
+          <p className="mb-6 opacity-75">Configure custom AI Receptionists</p>
         </div>
         <div className="m-5">
           <CreateAgentModal />

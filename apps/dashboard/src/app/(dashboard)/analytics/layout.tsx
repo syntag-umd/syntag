@@ -3,7 +3,7 @@ import React from "react";
 export default async function layout(props: { children: React.ReactNode }) {
   return (
     <div>
-      <div className="flex justify-between mb-5">
+      <div className="mb-5 flex justify-between">
         <div>
           <h1 className="mb-2 text-4xl font-bold">Analytics</h1>
           <p className="mb-6 opacity-75">

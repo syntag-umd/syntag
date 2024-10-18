@@ -12,10 +12,9 @@ interface useVapiProps {
   toggledLanguage?: "SPANISH" | "ENGLISH";
 }
 
-
 //TODO: Add toggled language
 
-export function useVapi(vapiAssistantId : string) {
+export function useVapi(vapiAssistantId: string) {
   const [isSpeechActive, setIsSpeechActive] = useState(false);
   const [callStatus, setCallStatus] = useState<CALL_STATUS>(
     CALL_STATUS.INACTIVE,

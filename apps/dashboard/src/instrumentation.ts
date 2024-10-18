@@ -9,6 +9,5 @@ export async function register() {
       },
     },
     propagators: ["tracecontext"],
-
   });
 }

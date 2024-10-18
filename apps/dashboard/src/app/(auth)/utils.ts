@@ -24,9 +24,12 @@ export async function isTokenValid(token: string | null | undefined) {
   }
 }
 
-import type { SignedOutAuthObject, SignedInAuthObject } from "@clerk/backend/internal";
+import type {
+  SignedOutAuthObject,
+  SignedInAuthObject,
+} from "@clerk/backend/internal";
 import { cookies } from "next/headers";
-type AuthObject = SignedInAuthObject | SignedOutAuthObject
+type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 type Auth = AuthObject & {
   redirectToSignIn: () => void;
   protect: () => SignedInAuthObject | never;

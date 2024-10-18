@@ -49,8 +49,6 @@ export async function uploadFileGC(
   return uploadPromise;
 }
 
-
-
 /** Uploads a base64 string as a proper file */
 export async function uploadBase64(filename: string, base64Mime: string) {
   const matches = base64Mime.match(/^data:(.+?);base64,(.+)$/);

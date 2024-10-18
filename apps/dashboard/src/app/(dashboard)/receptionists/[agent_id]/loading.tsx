@@ -3,7 +3,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 export default function loading() {
   return (
-    <div className={"flex items-center justify-between h-14" }>
+    <div className={"flex h-14 items-center justify-between"}>
       <div className="flex items-center gap-4">
         <Skeleton className="h-12 w-12 rounded-full" />
         <div className="space-y-2">

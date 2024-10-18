@@ -1,10 +1,10 @@
 "use client";
 
-import React from 'react';
-import { Row, Col } from 'antd';
-import CallCountCard from './CallCount'; 
-import TimeSavedCard from './TimeSaved';
-import AverageCallDurationCard from './AverageCallDuration';
+import React from "react";
+import { Row, Col } from "antd";
+import CallCountCard from "./CallCount";
+import TimeSavedCard from "./TimeSaved";
+import AverageCallDurationCard from "./AverageCallDuration";
 
 const AnalyticsCardGroup: React.FC<{ timeframe: string }> = ({ timeframe }) => {
   return (

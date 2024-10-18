@@ -32,7 +32,7 @@ export default function PopoverSettings({
               <DeleteButton
                 name={agentResponse.voice_assistant.name ?? "Unnamed"}
                 voice_assistant_uuid={agentResponse.voice_assistant.uuid}
-              button={
+                button={
                   <Button variant={"outline"}>
                     <Icons.trash size={"1.25rem"} className="mr-2" />
                     Delete

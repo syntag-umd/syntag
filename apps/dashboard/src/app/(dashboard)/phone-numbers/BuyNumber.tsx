@@ -95,9 +95,7 @@ export default function BuyNumber({
     >
       <DialogTrigger asChild>{button}</DialogTrigger>
       <DialogContent className="flex h-[min(100vh,_540px)] max-w-xl flex-col gap-4 bg-card">
-        <div>
-          {contentModal}
-        </div>
+        <div>{contentModal}</div>
         <div className="flex w-full flex-1 flex-col self-start">
           <div className="flex w-full items-center gap-2">
             <div className="basis-32 sm:basis-24">

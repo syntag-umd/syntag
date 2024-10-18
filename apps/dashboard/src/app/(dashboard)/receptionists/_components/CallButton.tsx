@@ -16,7 +16,7 @@ export const CallButton = ({
       onClick={toggleCall}
       onClickCapture={() => setSelected(!selected)}
       size="large"
-      style={{ fontSize: '1rem', padding: '20px', borderRadius: '6px' }}
+      style={{ fontSize: "1rem", padding: "20px", borderRadius: "6px" }}
       type="primary"
       className="m-1"
     >

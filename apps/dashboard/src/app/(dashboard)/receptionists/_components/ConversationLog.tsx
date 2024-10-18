@@ -12,7 +12,6 @@ const StyledCard = styled(Card)`
 `;
 
 const ConversationLog: React.FC = () => {
-
   const { agentResponse } = useAgent();
 
   const agentName = agentResponse?.voice_assistant.name;

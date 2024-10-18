@@ -8,13 +8,12 @@ export const helpRouter = createTRPCRouter({
     .input(
       z.object({
         problem: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
-
       const db_user = await ctx.db.user.findFirst({
-        where: { uuid: ctx.auth.sessionClaims.external_id }
-        });
+        where: { uuid: ctx.auth.sessionClaims.external_id },
+      });
 
       const { problem } = input;
       try {
@@ -38,7 +37,7 @@ export const helpRouter = createTRPCRouter({
                 },
               },
             }),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -49,7 +48,9 @@ export const helpRouter = createTRPCRouter({
         return { success: true, data };
       } catch (error) {
         console.error("Error submitting help request:", error);
-        throw new Error("Failed to submit help request. Please try again later.");
+        throw new Error(
+          "Failed to submit help request. Please try again later.",
+        );
       }
     }),
 });

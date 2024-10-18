@@ -458,7 +458,7 @@ export default function Convos(props: { agent_id: string }) {
                       return (
                         <li
                           key={convo.uuid}
-                          className="hover:text-card-foreground_hover mb-2 flex min-h-[50px] flex-col rounded-sm border-[1px] border-border px-4 py-2 hover:cursor-pointer hover:opacity-70"
+                          className="mb-2 flex min-h-[50px] flex-col rounded-sm border-[1px] border-border px-4 py-2 hover:cursor-pointer hover:text-card-foreground_hover hover:opacity-70"
                           onClick={() => {
                             setActiveConvo(String(index));
                             setDialogOpen(true);
@@ -631,7 +631,7 @@ const Convo = (props: { convo_uuid: string; convoSearch: ConvoSearch }) => {
           return (
             <li
               key={msg.id}
-              className={`${msg.role === "ASSISTANT" } flex flex-col rounded-lg border border-xl py-2 text-foreground`}
+              className={`${msg.role === "ASSISTANT"} border-xl flex flex-col rounded-lg border py-2 text-foreground`}
               style={{
                 borderColor:
                   msg.role === "ASSISTANT" ? "var(--primary)" : "var(--border)",

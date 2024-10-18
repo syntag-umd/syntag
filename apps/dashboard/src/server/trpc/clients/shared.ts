@@ -12,7 +12,7 @@ export function getBaseUrl(non_local = false) {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
 
-  if (non_local){
+  if (non_local) {
     throw new Error("getBaseUrl: non_local is true but no VERCEL_URL");
   }
 

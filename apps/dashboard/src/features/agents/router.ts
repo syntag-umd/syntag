@@ -12,7 +12,10 @@ import {
   type VoiceEnum,
   voicesRecord,
 } from "./types";
-import { getVapiAssistant, prepareTransferCallTool } from "@syntag/vapi/server/api-utils";
+import {
+  getVapiAssistant,
+  prepareTransferCallTool,
+} from "@syntag/vapi/server/api-utils";
 import {
   createTRPCRouter,
   publicProcedure,

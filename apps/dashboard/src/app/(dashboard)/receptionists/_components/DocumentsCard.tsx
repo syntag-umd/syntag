@@ -171,7 +171,7 @@ const DocumentsCard = () => {
       {/* Modal for FileUpload */}
       <Modal
         title="Upload Files"
-        visible={open}
+        open={open}
         onCancel={() => setOpen(false)}
         footer={null}
         destroyOnClose
