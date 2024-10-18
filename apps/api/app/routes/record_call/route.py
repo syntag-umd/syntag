@@ -134,7 +134,7 @@ async def store_transcription(
     messages: list,
     voicemail: bool,
     recording_url: str,
-    call_duration: float  # Accept call duration as a float
+    call_duration_seconds: float  # Accept call duration as a float
 ):
     """Helper function to store the transcription in the database."""
     transcription = ManualCallTranscription(
@@ -145,7 +145,7 @@ async def store_transcription(
         messages={'messages': messages},
         voicemail=voicemail,
         recording_url=recording_url,  # Store the recording URL
-        call_duration=call_duration  # Store the call duration
+        call_duration_seconds=call_duration_seconds  # Store the call duration
     )
     db.add(transcription)
     db.commit()
@@ -245,7 +245,7 @@ async def voicemail_transcribed(
     # Store the transcription along with the recording URL and call duration
     await store_transcription(
         db, CallSid, RecordingSid, From_, To_, messages, voicemail=True, 
-        recording_url=RecordingUrl, call_duration=float(call_duration)
+        recording_url=RecordingUrl, call_duration_seconds=float(call_duration)
     )
     
     return Response(content="Voicemail received and transcribed.", media_type='text/plain')
@@ -278,7 +278,7 @@ async def recording_completed(
     # Store the transcription along with the recording URL and call duration
     await store_transcription(
         db, CallSid, RecordingSid, From_, To_, messages, voicemail=False, 
-        recording_url=RecordingUrl, call_duration=float(call_duration)
+        recording_url=RecordingUrl, call_duration_seconds=float(call_duration)
     )
 
     return Response(content='Recording processed, transcription saved, and audio file deleted from GCS', media_type='text/plain')
