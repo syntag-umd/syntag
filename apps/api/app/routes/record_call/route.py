@@ -43,6 +43,8 @@ auth_token = settings.TWILIO_AUTH_TOKEN
 client = Client(account_sid, auth_token)
 validator = RequestValidator(auth_token)
 
+recipient_number = '+18578691479'  # Vikram's Number
+
 router = APIRouter(prefix="/record-call")
 
 async def validate_twilio_request(request: Request):
@@ -67,19 +69,157 @@ async def validate_twilio_request(request: Request):
 async def voice(request: Request):
     await validate_twilio_request(request)
     response = VoiceResponse()
-    
-    # Proceed with your logic
+
     response.say('Please note, this call will be recorded.')
 
     dial = Dial(
         record='record-from-answer',
-        recording_status_callback=api_domain+'/record-call/recording-completed',
+        recording_status_callback=api_domain + '/record-call/recording-completed',
         recording_status_callback_method='POST'
     )
-    dial.number('+18578691479')
+
+    dial.number(recipient_number, action='/record-call/voicemail', method='POST') 
     response.append(dial)
 
     return Response(content=str(response), media_type='application/xml')
+
+@router.api_route("/voicemail", methods=["POST"])
+async def voicemail(request: Request):
+    """Voicemail endpoint triggered when the call is not answered."""
+    await validate_twilio_request(request)
+    response = VoiceResponse()
+
+    # Ask the caller to leave a voicemail
+    response.say("Sorry, we're currently assisting other customers right now. We'll call you back as soon as possible. Please leave your full name and your desired service and appointment time after the beep.")
+
+    # Record the voicemail
+    response.record(
+        max_length=60,  # Limit the voicemail duration to 60 seconds
+        play_beep=True,
+        transcribe=True,  # Optional: Enable transcription for the voicemail
+        transcribe_callback='/record-call/voicemail-transcribed'  # Transcription callback
+    )
+
+    return Response(content=str(response), media_type='application/xml')
+
+async def store_transcription(
+    db: Session,
+    CallSid: str,
+    RecordingSid: str,
+    From_: str,
+    To_: str,
+    messages: list,
+    voicemail: bool
+):
+    """Helper function to store the transcription in the database."""
+    transcription = ManualCallTranscription(
+        call_sid=CallSid,
+        recording_sid=RecordingSid,
+        caller_phone_number=From_,
+        called_phone_number=To_,
+        messages={'messages': messages},
+        voicemail=voicemail
+    )
+    db.add(transcription)
+    db.commit()
+    
+async def transcribe_recording(RecordingUrl: str, RecordingSid: str) -> str:
+    
+    """Helper function to transcribe a recording from Twilio."""
+    # Initialize Google Cloud clients with appropriate credentials
+    transcription_service_account_file = os.path.join(
+        project_root, 'service_account_files/transcription-service-account-file.json'
+    )
+    credentials = service_account.Credentials.from_service_account_file(
+        transcription_service_account_file
+    )
+    speech_client = speech.SpeechClient(credentials=credentials)
+
+    # Initialize Google Cloud Storage client
+    storage_service_account_file = os.path.join(
+        project_root, 'service_account_files/storage-service-account-file.json'
+    )
+    storage_client = storage.Client(credentials=credentials)
+
+    # Specify GCS bucket name
+    bucket_name = 'manual-call-transcript-recordings'
+    bucket = storage_client.bucket(bucket_name)
+
+    # Create a blob and upload the recording to GCS
+    blob = bucket.blob(f'recordings/{RecordingSid}.wav')
+    recording_url = RecordingUrl + '.wav'
+
+    try:
+        with requests.get(recording_url, auth=HTTPBasicAuth(account_sid, auth_token), stream=True) as recording_response:
+            if recording_response.status_code != 200:
+                raise Exception("Failed to download recording")
+
+            buffer = BytesIO()
+            for chunk in recording_response.iter_content(chunk_size=8192):
+                buffer.write(chunk)
+            buffer.seek(0)
+
+            # Upload the buffer to GCS
+            blob.upload_from_file(buffer)
+
+        # Generate GCS URI
+        gcs_uri = f'gs://{bucket_name}/recordings/{RecordingSid}.wav'
+        
+        # Configure recognition settings
+        audio = speech.RecognitionAudio(uri=gcs_uri)
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=8000,
+            language_code='en-US',
+            enable_speaker_diarization=True,
+            diarization_speaker_count=2,
+            model='phone_call'
+        )
+
+        # Transcribe the audio file
+        operation = speech_client.long_running_recognize(config=config, audio=audio)
+        response = operation.result(timeout=300)
+
+        # Construct transcript text
+        transcript = ''
+        for result in response.results:
+            transcript += result.alternatives[0].transcript + ' '
+
+    finally:
+        # Clean up by deleting the audio file from GCS
+        blob.delete()
+
+    return transcript
+
+
+@router.post("/voicemail-transcribed")
+async def voicemail_completed(
+    request: Request,
+    RecordingSid: str = Form(...),
+    RecordingUrl: str = Form(...),
+    CallSid: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    """Handle the voicemail after it's recorded."""
+    await validate_twilio_request(request)
+    
+    # Fetch the call details from Twilio
+    call = client.calls(CallSid).fetch()
+    From_ = call.from_formatted
+    To_ = call.to_formatted
+
+    # Transcribe the voicemail
+    transcript = await transcribe_recording(RecordingUrl, RecordingSid)
+
+    # Process the transcription text into messages
+    messages = [{"role": "customer", "content": transcript}]
+    
+    # Store the transcription
+    await store_transcription(db, CallSid, RecordingSid, From_, To_, messages, voicemail=True)
+    
+    return Response(content="Voicemail received and transcribed.", media_type='text/plain')
+
+
 
 @router.post("/recording-completed")
 async def recording_completed(
@@ -89,121 +229,23 @@ async def recording_completed(
     CallSid: str = Form(...),
     db: Session = Depends(get_db)
 ):
-
-    # Handle recording status callbacks and process transcription with Google Speech-to-Text.
     await validate_twilio_request(request)
-    
-    # Get the call object
-    call = client.calls(CallSid).fetch()
 
-    # Get the call details
+    # Fetch the call details
+    call = client.calls(CallSid).fetch()
     From_ = call.from_formatted
     To_ = call.to_formatted
+
+    # Transcribe the recording
+    transcript = await transcribe_recording(RecordingUrl, RecordingSid)
     
-    # Initialize Google Cloud Speech-to-Text client with credentials
-    transcription_service_account_file = os.path.join(
-        project_root, 'service_account_files/transcription-service-account-file.json'
-    )
-    credentials = service_account.Credentials.from_service_account_file(
-        transcription_service_account_file
-    )
-    speech_client = speech.SpeechClient(credentials=credentials)
+    # Process the transcription text into messages
+    messages = await process_transcript_with_openai(transcript)
 
-    # Initialize Google Cloud Storage client with credentials
-    storage_service_account_file = os.path.join(
-        project_root, 'service_account_files/storage-service-account-file.json'
-    )
-    credentials = service_account.Credentials.from_service_account_file(
-        storage_service_account_file
-    )
-    storage_client = storage.Client(credentials=credentials)
-
-    # Specify your GCS bucket name
-    bucket_name = 'manual-call-transcript-recordings'  # Replace with your bucket name
-    bucket = storage_client.bucket(bucket_name)
-
-    # Create a blob (object) in the bucket
-    blob = bucket.blob(f'recordings/{RecordingSid}.wav')
-
-    # Stream the recording from Twilio and upload to GCS
-    recording_url = RecordingUrl + '.wav'
-
-    try:
-        with requests.get(
-            recording_url,
-            auth=HTTPBasicAuth(account_sid, auth_token),
-            stream=True
-        ) as recording_response:
-            if recording_response.status_code != 200:
-                return Response(content='Failed to download recording', media_type='text/plain', status_code=500)
-
-            # Read the streamed data into a BytesIO buffer
-            buffer = BytesIO()
-            for chunk in recording_response.iter_content(chunk_size=8192):
-                buffer.write(chunk)
-            buffer.seek(0)
-
-            # Upload the buffer to GCS
-            blob.upload_from_file(buffer)
-
-        # Generate the GCS URI for the uploaded audio file
-        gcs_uri = f'gs://{bucket_name}/recordings/{RecordingSid}.wav'
-
-
-        # Configure recognition settings
-        audio = speech.RecognitionAudio(uri=gcs_uri)
-                
-        config = speech.RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,  # Adjust if necessary
-            sample_rate_hertz=8000,
-            language_code='en-US',
-            enable_speaker_diarization=True,
-            diarization_speaker_count=2,
-            model='phone_call'
-        )
-
-        # Asynchronously transcribe the audio file
-        operation = speech_client.long_running_recognize(config=config, audio=audio)
-        
-        # Wait for the transcription operation to complete
-        response = operation.result(timeout=300)
-        
-        # generate the transcription text
-        transcript = ''
-        for result in response.results:
-            transcript += result.alternatives[0].transcript + ' '
-        
-        # Process the transcription results
-        messages = await process_transcript_with_openai(transcript)
-        
-        # Store transcription in the database
-        transcription = ManualCallTranscription(
-            call_sid=CallSid,
-            recording_sid=RecordingSid,
-            caller_phone_number=From_,
-            called_phone_number=To_,
-            messages={'messages': messages}
-        )
-        db.add(transcription)
-        db.commit()
-
-    except Exception as e:
-        # Handle exceptions during the transcription process
-        return Response(content=f'An error occurred: {e}', media_type='text/plain', status_code=500)
-    finally:
-        # Delete the audio file from GCS
-        try:
-            blob.delete()
-        except Exception as delete_error:
-            # Log the error or handle it as needed
-            print(f"Failed to delete GCS object: {delete_error}")
-            # Optionally, you can decide whether to fail the request or proceed
-
-        # Ensure the database session is closed
-        db.close()
+    # Store the transcription
+    await store_transcription(db, CallSid, RecordingSid, From_, To_, messages, voicemail=False)
 
     return Response(content='Recording processed, transcription saved, and audio file deleted from GCS', media_type='text/plain')
-
 
 
 async def process_transcript_with_openai(transcription_text):
@@ -238,7 +280,6 @@ async def process_transcript_with_openai(transcription_text):
 
     assistant_reply = response.choices[0].message.content
     
-    print(assistant_reply)
 
     # Parse the assistant's reply into a Python list
     import json
