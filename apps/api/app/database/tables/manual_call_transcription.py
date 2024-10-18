@@ -22,3 +22,5 @@ class ManualCallTranscription(Base):
     called_phone_number: str = Column(String)
     timestamp: datetime = Column(DateTime, default=datetime.utcnow)
     voicemail: bool = Column(Boolean, default=False)
+    recording_url: str = Column(String)
+    call_duration_seconds: int = Column(Integer)
