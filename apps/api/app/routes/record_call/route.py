@@ -78,7 +78,9 @@ async def voice(request: Request):
         recording_status_callback_method='POST', 
         action='/record-call/dial-status', 
         method='POST',
-        answerOnBridge=True  # This line ensures the call is only "answered" when the recipient picks up
+        answerOnBridge=True,
+        timeout=20  # Set timeout to 20 seconds
+# This line ensures the call is only "answered" when the recipient picks up
     )
 
 
