@@ -21,6 +21,16 @@ from google.cloud import speech_v1p1beta1 as speech
 import openai
 from openai import OpenAI
 
+import pusher
+
+pusher_client = pusher.Pusher(
+    app_id=settings.PUSHER_APP_ID,
+    key=settings.PUSHER_KEY,
+    secret=settings.PUSHER_SECRET,
+    cluster=settings.PUSHER_CLUSTER,
+    ssl=True
+)
+
 openai_client = OpenAI()
 
 openai.api_key = settings.OPENAI_API_KEY
@@ -68,6 +78,22 @@ async def validate_twilio_request(request: Request):
 @router.api_route("/voice", methods=["GET", "POST"])
 async def voice(request: Request):
     await validate_twilio_request(request)
+    
+    if request.method == 'POST':
+        post_args = await request.form()
+        params = dict(post_args)
+    else:
+        params = dict(request.query_params)
+    
+    from_number = params.get('From')
+    to_number = params.get('To')
+
+    # Send event to Pusher
+    pusher_client.trigger('call-channel', 'incoming-call', {
+        'from_number': from_number,
+        'to_number': to_number
+    })
+    
     response = VoiceResponse()
 
     response.say('Please note, this call will be recorded.')
@@ -93,9 +119,15 @@ async def voice(request: Request):
 async def dial_status(request: Request):
     """Handle the status after the Dial verb completes."""
     await validate_twilio_request(request)
-    params = await request.form()
+    
+    if request.method == 'POST':
+        post_args = await request.form()
+        params = dict(post_args)
+    else:
+        params = dict(request.query_params)
+    
     dial_call_status = params.get('DialCallStatus')
-
+    
     response = VoiceResponse()
     if dial_call_status in ['no-answer', 'busy', 'failed', 'canceled']:
         # The call was not answered, proceed to voicemail
