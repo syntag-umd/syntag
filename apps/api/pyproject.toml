@@ -132,6 +132,7 @@ apify-client = "1.8.1"
 pytz = "^2024.2"
 google-cloud-speech = "^2.27.0"
 google-cloud-storage = "^2.18.2"
+pusher = "^3.3.2"
 
 [tool.poetry.group.dev.dependencies]
 aiohttp = "3.9.1"
