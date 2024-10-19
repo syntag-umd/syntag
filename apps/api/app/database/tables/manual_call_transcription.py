@@ -25,3 +25,4 @@ class ManualCallTranscription(Base):
     recording_url: str = Column(String)
     call_duration_seconds: int = Column(Integer)
     appointment_booked: bool = Column(Boolean, default=False, nullable=False)
+    appointment_value_in_dollars: int = Column(Integer, nullable=False, default=0)
