@@ -66,8 +66,8 @@ async def ping_proxy():
 
             return {f"{name}": elapsed_time for (name, elapsed_time) in results}
     except Exception as e:
-        logging.error(f"Error on ping: {str(e)}")
-        return {"error": str(e)}
+        logging.error(f"Error on ping: {repr(e)}")
+        return {"error": repr(e)}
 
 
 @router.post("/proxy/{env}/{path}/chat/completions")
