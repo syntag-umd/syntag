@@ -28,6 +28,9 @@
     "@hookform/resolvers": "^3.3.4",
     "@mui/icons-material": "^5.15.16",
     "@newrelic/browser-agent": "^1.268.0",
+    "@opentelemetry/api-logs": ">=0.46.0 && <1.0.0",
+    "@opentelemetry/instrumentation": ">=0.46.0 && <1.0.0",
+    "@opentelemetry/sdk-logs": ">=0.46.0 && <1.0.0",
     "@prisma/client": "^5.10.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -82,6 +85,7 @@
     "zustand": "5.0.0-rc.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.13.0",
     "@syntag/tsconfig": "workspace:*",
     "@types/eslint": "^8.56.2",
     "@types/jsonwebtoken": "^9.0.6",
@@ -91,7 +95,7 @@
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
-    "eslint": "^8.57.0",
+    "eslint": "^8.57.1",
     "eslint-config-next": "^14.1.3",
     "postcss": "^8.4.34",
     "prettier": "^3.2.5",

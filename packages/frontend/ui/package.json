@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint ."
   },
   "exports": {
     "./*": {
@@ -12,7 +13,8 @@
     }
   },
   "devDependencies": {
-    "@syntag/tsconfig": "workspace:*"
+    "@syntag/tsconfig": "workspace:*",
+    "eslint": "^9.13.0"
   },
   "keywords": [],
   "author": "",
