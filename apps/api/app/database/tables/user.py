@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import UUID, Column, Integer, Text, text, Float
+from sqlalchemy import UUID, Column, Integer, Text, text, Float, Boolean
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -45,6 +45,7 @@ class User(Base):
     phone_number_balance: int = Column(
         Integer, nullable=False, server_default=text("0")
     )
+    is_admin_account: bool = Column(Boolean, nullable=False, server_default=text("false"))
     account_balance: float = Column(Float, nullable=False, server_default=text("0"))
 
     account_balance_recharge_threshold: Optional[float] = Column(Float, nullable=True)
