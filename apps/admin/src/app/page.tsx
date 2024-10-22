@@ -1,5 +1,5 @@
 "use client"; // Add this directive at the top of the file
-import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import React, { useEffect, useState } from 'react';
 import { Layout, Tabs, Typography, Statistic, Row, Col, Menu } from 'antd';
 import { UserOutlined, MessageOutlined, RobotOutlined } from '@ant-design/icons';
@@ -21,34 +21,23 @@ const AdminDashboard: React.FC = () => {
     averageDuration: 0,
   });
 
-  const [user, setUser] = useState<{ firstName: string; lastName: string } | null>(null);
+  const { user, isLoaded } = useUser(); // Use the useUser hook to get user data
   const [selectedTab, setSelectedTab] = useState('1'); // State for the selected tab
-
-  // useEffect(() => {
-  //   // Fetch metrics from your API
-  //   const fetchMetrics = async () => {
-  //     const response = await fetch('/api/metrics'); // Adjust the API endpoint
-  //     const metricsData = await response.json();
-  //     setMetrics(metricsData);
-  //   };
-
-  //   // Simulate fetching user data
-  //   const fetchUser = async () => {
-  //     // Dummy user data for now
-  //     const dummyUser = {
-  //       firstName: "John",
-  //       lastName: "Doe",
-  //     };
-  //     setUser(dummyUser);
-  //   };
-
-  //   fetchMetrics();
-  //   fetchUser();
-  // }, []);
 
   const handleMenuClick = (key: string) => {
     setSelectedTab(key); // Update selected tab state
   };
+
+  // Fetch metrics when the component mounts
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      const response = await fetch('/api/metrics'); // Adjust the API endpoint
+      const metricsData = await response.json();
+      setMetrics(metricsData);
+    };
+
+    fetchMetrics();
+  }, []);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -75,7 +64,7 @@ const AdminDashboard: React.FC = () => {
         </Header>
 
         <Content style={{ margin: '24px 16px 0' }}>
-          {user && (
+          {isLoaded && user && ( // Check if user data is loaded and available
             <Title level={4}>
               Welcome, {user.firstName} {user.lastName}!
             </Title>
@@ -113,14 +102,12 @@ const AdminDashboard: React.FC = () => {
               </Row>
             </TabPane>
             <TabPane tab="Customers" key="2">
-              {/* Add your customer management logic here */}
               <Title level={4}>Customer Management</Title>
-              {/* Display customer-related data or components here */}
+              {/* Add your customer management logic here */}
             </TabPane>
             <TabPane tab="Conversations" key="3">
-              {/* Add your conversations management logic here */}
               <Title level={4}>Conversations Management</Title>
-              {/* Display conversations-related data or components here */}
+              {/* Add your conversations management logic here */}
             </TabPane>
           </Tabs>
         </Content>

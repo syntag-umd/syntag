@@ -12,9 +12,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <body>
           <header>
-         
-    
-            
+          {/*Based on Clerk set up tutorial
+            Modification:
+            No buttons: 
+            -Sign button isn't required when loading the page
+            -Logout Button is put in app/page.tsx so it aligns better with the page
+          */}
           </header>
           <main>{children}</main>
         </body>
