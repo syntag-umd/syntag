@@ -1,4 +1,5 @@
 "use client"; // Add this directive at the top of the file
+import { createClient } from '@supabase/supabase-js';
 import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import React, { useEffect, useState } from 'react';
 import { Layout, Tabs, Typography, Statistic, Row, Col, Menu } from 'antd';
@@ -7,6 +8,11 @@ import { UserOutlined, MessageOutlined, RobotOutlined } from '@ant-design/icons'
 const { Header, Content, Sider } = Layout;
 const { TabPane } = Tabs;
 const { Title } = Typography;
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const AdminDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState({
@@ -31,9 +37,21 @@ const AdminDashboard: React.FC = () => {
   // Fetch metrics when the component mounts
   useEffect(() => {
     const fetchMetrics = async () => {
-      const response = await fetch('/api/metrics'); // Adjust the API endpoint
-      const metricsData = await response.json();
-      setMetrics(metricsData);
+      const { data: users, error } = await supabase
+        .from('user') // Specify the table name
+        .select('id'); // Fetch only the 'id' or any other field if needed
+
+      if (error) {
+        console.error("Error fetching users:", error);
+        return;
+      }
+
+      const totalAccounts = users.length; // Count the number of users
+      // Update your state with the new metric
+      setMetrics(prevMetrics => ({
+        ...prevMetrics,
+        totalAccounts: totalAccounts,
+      }));
     };
 
     fetchMetrics();
