@@ -1,0 +1,63 @@
+name: Check for migrations to the production database
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-migration_check.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Set up cache for Poetry
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pypoetry
+            apps/api/.venv
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: poetry install --no-interaction
+
+      - name: Check for Alembic changes
+        id: alembic_check
+        working-directory: apps/api
+        run: |
+          source .venv/bin/activate
+          if alembic check | grep -q 'New upgrade operations detected'; then
+            echo "New upgrade operations detected. Please run the migration locally and run alembic revision --autogenerate -m 'message' to generate a new migration script."
+            exit 1
+          fi
+
+      - name: Check Alembic Migration Version
+        uses: DevGlitch/alembic-migration-checker@v1
+        with:
+          db_host: ${{ secrets.DATABASE_HOST }}
+          db_port: ${{ secrets.DATABASE_PORT }}
+          db_user: ${{ secrets.DATABASE_USER }}
+          db_password: ${{ secrets.DATABASE_PASSWORD }}
+          db_name: ${{ secrets.DATABASE_NAME }}
+          migrations_path: apps/api/alembic/
