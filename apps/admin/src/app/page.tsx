@@ -1,101 +1,132 @@
-import Image from "next/image";
+"use client"; // Add this directive at the top of the file
+import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import React, { useEffect, useState } from 'react';
+import { Layout, Tabs, Typography, Statistic, Row, Col, Menu } from 'antd';
+import { UserOutlined, MessageOutlined, RobotOutlined } from '@ant-design/icons';
 
-export default function Home() {
+const { Header, Content, Sider } = Layout;
+const { TabPane } = Tabs;
+const { Title } = Typography;
+
+const AdminDashboard: React.FC = () => {
+  const [metrics, setMetrics] = useState({
+    totalAccounts: 0,
+    adminAccounts: 0,
+    regularAccounts: 0,
+    squireAccounts: 0,
+    totalAssistants: 0,
+    squireAssistants: 0,
+    regularAssistants: 0,
+    totalDuration: 0,
+    averageDuration: 0,
+  });
+
+  const [user, setUser] = useState<{ firstName: string; lastName: string } | null>(null);
+  const [selectedTab, setSelectedTab] = useState('1'); // State for the selected tab
+
+  // useEffect(() => {
+  //   // Fetch metrics from your API
+  //   const fetchMetrics = async () => {
+  //     const response = await fetch('/api/metrics'); // Adjust the API endpoint
+  //     const metricsData = await response.json();
+  //     setMetrics(metricsData);
+  //   };
+
+  //   // Simulate fetching user data
+  //   const fetchUser = async () => {
+  //     // Dummy user data for now
+  //     const dummyUser = {
+  //       firstName: "John",
+  //       lastName: "Doe",
+  //     };
+  //     setUser(dummyUser);
+  //   };
+
+  //   fetchMetrics();
+  //   fetchUser();
+  // }, []);
+
+  const handleMenuClick = (key: string) => {
+    setSelectedTab(key); // Update selected tab state
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider width={250}>
+        <div className="logo" />
+        <Menu theme="dark" mode="inline" selectedKeys={[selectedTab]} onClick={({ key }) => handleMenuClick(key)}>
+          <Menu.Item key="1" icon={<UserOutlined />}>
+            Home
+          </Menu.Item>
+          <Menu.Item key="2" icon={<RobotOutlined />}>
+            Customers
+          </Menu.Item>
+          <Menu.Item key="3" icon={<MessageOutlined />}>
+            Conversations
+          </Menu.Item>
+        </Menu>
+      </Sider>
+      <Layout>
+        <Header style={{ background: '#fff', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={3} style={{ margin: 0 }}>Admin Dashboard</Title>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </Header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <Content style={{ margin: '24px 16px 0' }}>
+          {user && (
+            <Title level={4}>
+              Welcome, {user.firstName} {user.lastName}!
+            </Title>
+          )}
+          <Tabs activeKey={selectedTab} onChange={setSelectedTab}>
+            <TabPane tab="Home" key="1">
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Statistic title="Total Accounts" value={metrics.totalAccounts} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Admin Accounts" value={metrics.adminAccounts} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Regular Accounts" value={metrics.regularAccounts} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Squire Accounts" value={metrics.squireAccounts} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Total Assistants" value={metrics.totalAssistants} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Squire Assistants" value={metrics.squireAssistants} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Regular Assistants" value={metrics.regularAssistants} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Total Duration" value={metrics.totalDuration} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Average Duration" value={metrics.averageDuration} />
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane tab="Customers" key="2">
+              {/* Add your customer management logic here */}
+              <Title level={4}>Customer Management</Title>
+              {/* Display customer-related data or components here */}
+            </TabPane>
+            <TabPane tab="Conversations" key="3">
+              {/* Add your conversations management logic here */}
+              <Title level={4}>Conversations Management</Title>
+              {/* Display conversations-related data or components here */}
+            </TabPane>
+          </Tabs>
+        </Content>
+      </Layout>
+    </Layout>
   );
-}
+};
+
+export default AdminDashboard;
