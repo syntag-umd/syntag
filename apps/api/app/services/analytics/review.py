@@ -33,7 +33,7 @@ def extract_review(conversation: str, shop_name: str):
         
         completion_content = completion.choices[0].message.content
         
-        parsed_completion = client.beta.chat.completions.parse(
+        parsed_completion = openai.beta.chat.completions.parse(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "Extract the review and the user's willingness to leave a review."},
