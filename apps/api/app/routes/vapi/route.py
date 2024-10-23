@@ -357,50 +357,48 @@ async def server_url(
                         from_=assistant_pn,
                         to=caller_pn
                     )
+                    
+                    await asyncio.sleep(2)
 
                     message = client.messages.create(
                         body="To help you out, I drafted up a little something of a review based on our conversation.",
                         from_=assistant_pn,
                         to=caller_pn
                     )
+                    
+                    await asyncio.sleep(2)
 
                     message = client.messages.create(
                         body=review,
                         from_=assistant_pn,
                         to=caller_pn
                     )
+                    
+                    await asyncio.sleep(2)
 
                     message = client.messages.create(
                         body=f"I recommend you copy the review so it's handy if you decide to submit it! Here's a link to our Google Reviews page: {google_reviews_link}",
                         from_=assistant_pn,
                         to=caller_pn
                     )
+                    
+                    await asyncio.sleep(2)
 
                     message = client.messages.create(
                         body="Thanks for your time today. Goodbye!",
                         from_=assistant_pn,
                         to=caller_pn
                     )
+                    
+                    await asyncio.sleep(2)
+                    
                 else:
                     # Flow for customers not willing to leave a review
                     message = client.messages.create(
-                        body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us!",
+                        body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us! If you change your mind and want to leave a review, just let us know!",
                         from_=assistant_pn,
                         to=caller_pn
                     )
-
-                    message = client.messages.create(
-                        body="We appreciate your feedback. Feel free to reach out anytime if you need anything!",
-                        from_=assistant_pn,
-                        to=caller_pn
-                    )
-
-                    message = client.messages.create(
-                        body="Thanks for your time today. Goodbye!",
-                        from_=assistant_pn,
-                        to=caller_pn
-                    )
-                
             
             summary = summarize_conversation(db_messages)
             conversation.summary = summary
