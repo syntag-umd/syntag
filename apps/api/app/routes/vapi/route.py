@@ -338,48 +338,75 @@ async def server_url(
                 assistant_pn = eocReport["phoneNumber"].get("number")
                 
                 # make an OpenAI request to fetch a user review from the conversation
-                review = extract_review(conversation_string, shop_name)
+                review_details = extract_review(conversation_string, shop_name)
                 
-                # Text the review to the caller pn
+                # extract the review, and their willingness to review
+                review = review_details["review"]
+                willing_to_leave_review = review_details["willing_to_leave_review"]
+
+                # Text the review to the caller if willing
                 account_sid = settings.TWILIO_ACCOUNT_SID
                 auth_token = settings.TWILIO_AUTH_TOKEN
-                
+
                 client = Client(account_sid, auth_token)
-                
-                message = client.messages.create(
-                    body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us! Listen - if you want to help us out, it would mean a lot if you could leave us a review.",
-                    from_=assistant_pn,
-                    to=caller_pn
-                )
-                await asyncio.sleep(6)  # Adjust the wait time as needed
 
-                message = client.messages.create(
-                    body="To help you out, I drafted up a little something of a review based on our conversation.",
-                    from_=assistant_pn,
-                    to=caller_pn
-                )
-                await asyncio.sleep(2)  # Adjust the wait time as needed
+                if willing_to_leave_review:
+                    # Flow for customers willing to leave a review
+                    message = client.messages.create(
+                        body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us! We’d love it if you could leave us a review - it would mean a lot!",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+                    await asyncio.sleep(6)  # Adjust the wait time as needed
 
-                message = client.messages.create(
-                    body=review,
-                    from_=assistant_pn,
-                    to=caller_pn
-                )
-                await asyncio.sleep(10)  # Adjust the wait time as needed
+                    message = client.messages.create(
+                        body="To help you out, I drafted up a little something of a review based on our conversation.",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+                    await asyncio.sleep(2)  # Adjust the wait time as needed
 
-                message = client.messages.create(
-                    body=f"I recommend you copy the review so it's handy if you decide to submit it! Here's a link to our Google Reviews page: {google_reviews_link}",
-                    from_=assistant_pn,
-                    to=caller_pn
-                )
-                await asyncio.sleep(5)  # Adjust the wait time as needed
+                    message = client.messages.create(
+                        body=review,
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+                    await asyncio.sleep(10)  # Adjust the wait time as needed
 
-                message = client.messages.create(
-                    body="Thanks for your time today. Goodbye!",
-                    from_=assistant_pn,
-                    to=caller_pn
-                )
-                    
+                    message = client.messages.create(
+                        body=f"I recommend you copy the review so it's handy if you decide to submit it! Here's a link to our Google Reviews page: {google_reviews_link}",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+                    await asyncio.sleep(5)  # Adjust the wait time as needed
+
+                    message = client.messages.create(
+                        body="Thanks for your time today. Goodbye!",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+                else:
+                    # Flow for customers not willing to leave a review
+                    message = client.messages.create(
+                        body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us!",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+                    await asyncio.sleep(6)  # Adjust the wait time as needed
+
+                    message = client.messages.create(
+                        body="We appreciate your feedback. Feel free to reach out anytime if you need anything!",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
+
+                    await asyncio.sleep(5)  # Adjust the wait time as needed
+
+                    message = client.messages.create(
+                        body="Thanks for your time today. Goodbye!",
+                        from_=assistant_pn,
+                        to=caller_pn
+                    )
                 
             
             summary = summarize_conversation(db_messages)

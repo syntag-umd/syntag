@@ -1,36 +1,59 @@
-import logging
-from typing import List
-
 import openai
-from app.database.tables.message import Message
-from app.models.enums import Role
-from app.utils import get_token_count
+import logging
+from pydantic import BaseModel
 
+class TranscriptReview(BaseModel):
+    review: str
+    willing_to_leave_review: bool
 
 def extract_review(conversation: str, shop_name: str):
-    """Summarizes based on the beginning and end of the conversation"""
+    """Extracts both the review content and whether the user was willing to leave a review."""
     model = "gpt-4o-mini"
     
+    message_dicts = [
+        {
+            "role": "system",
+            "content": (
+                f"Your job is to summarize whether or not the user was willing to leave a review "
+                f"and also provide a compelling review for {shop_name} based on a conversation "
+                f"between one of {shop_name}'s employees and a customer. The review should be from the "
+                f"customer's perspective, using their words. ONLY GIVE ME THE REVIEW AND WHETHER "
+                f"THEY WERE WILLING TO LEAVE A REVIEW."
+            )
+        },
+        {"role": "user", "content": conversation},
+    ]
+    
     try:
-        
-        review = openai.chat.completions.create(
+        completion = openai.chat.completions.create(
             model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Your job is to write a compelling review for {shop_name} based on a conversation between one of {shop_name}'s employees and a customer. Make sure the review accurately portrays the user's opinion, and uses as many of their words as possible. The review should be written from the customer's point of view. ONLY GIVE ME THE REVIEW, AND NOTHING ELSE",
-                },
-                {"role": "user", "content": conversation},
-            ],
-            temperature=0.3,
+            messages=message_dicts,
+            temperature=0.3
         )
         
-        review_content = review.choices[0].message.content
+        completion_content = completion.choices[0].message.content
+        
+        parsed_completion = client.beta.chat.completions.parse(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Extract the review and the user's willingness to leave a review."},
+                {"role": "user", "content": completion.choices[0].message.content}
+            ],
+            response_format=TranscriptReview,
+        )
+        
+        # Extract parsed data
+        parsed_result = parsed_completion.choices[0].message.parsed
+        
+        review = parsed_result.review
+        willing_to_leave_review = parsed_result.willing_to_leave_review
     
     except Exception as e:
-        logging.error(
-            f"Error openai summarization: {e}",
-        )
-        review_content = None
+        logging.error(f"Error in OpenAI parsing: {e}")
+        review = None
+        willing_to_leave_review = None
 
-    return review_content
+    return {
+        "review": review,
+        "willing_to_leave_review": willing_to_leave_review,
+    }
