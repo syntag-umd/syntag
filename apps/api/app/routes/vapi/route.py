@@ -54,6 +54,8 @@ from datetime import datetime, timedelta
 from twilio.rest import Client
 from twilio.http.async_http_client import AsyncTwilioHttpClient
 
+import asyncio
+
 router = APIRouter(prefix="/vapi")
 
 
