@@ -357,28 +357,24 @@ async def server_url(
                         from_=assistant_pn,
                         to=caller_pn
                     )
-                    await asyncio.sleep(6)  # Adjust the wait time as needed
 
                     message = client.messages.create(
                         body="To help you out, I drafted up a little something of a review based on our conversation.",
                         from_=assistant_pn,
                         to=caller_pn
                     )
-                    await asyncio.sleep(2)  # Adjust the wait time as needed
 
                     message = client.messages.create(
                         body=review,
                         from_=assistant_pn,
                         to=caller_pn
                     )
-                    await asyncio.sleep(10)  # Adjust the wait time as needed
 
                     message = client.messages.create(
                         body=f"I recommend you copy the review so it's handy if you decide to submit it! Here's a link to our Google Reviews page: {google_reviews_link}",
                         from_=assistant_pn,
                         to=caller_pn
                     )
-                    await asyncio.sleep(5)  # Adjust the wait time as needed
 
                     message = client.messages.create(
                         body="Thanks for your time today. Goodbye!",
@@ -392,15 +388,12 @@ async def server_url(
                         from_=assistant_pn,
                         to=caller_pn
                     )
-                    await asyncio.sleep(6)  # Adjust the wait time as needed
 
                     message = client.messages.create(
                         body="We appreciate your feedback. Feel free to reach out anytime if you need anything!",
                         from_=assistant_pn,
                         to=caller_pn
                     )
-
-                    await asyncio.sleep(5)  # Adjust the wait time as needed
 
                     message = client.messages.create(
                         body="Thanks for your time today. Goodbye!",
