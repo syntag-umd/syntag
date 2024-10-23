@@ -34,28 +34,44 @@ const AdminDashboard: React.FC = () => {
     setSelectedTab(key); // Update selected tab state
   };
 
-  // Fetch metrics when the component mounts
   useEffect(() => {
     const fetchMetrics = async () => {
-      const { data: users, error } = await supabase
+      // Fetch all users
+      const { data: users, error: userError } = await supabase
         .from('user') // Specify the table name
         .select('id'); // Fetch only the 'id' or any other field if needed
-
-      if (error) {
-        console.error("Error fetching users:", error);
+  
+      if (userError) {
+        console.error("Error fetching users:", userError);
         return;
       }
-
-      const totalAccounts = users.length; // Count the number of users
-      // Update your state with the new metric
+  
+      // Fetch admin users
+      const { data: adminUsers, error: adminError } = await supabase
+        .from('user')
+        .select('id')
+        .eq('is_admin_account', true); // Query to fetch only admin accounts
+  
+      if (adminError) {
+        console.error("Error fetching admin accounts:", adminError);
+        return;
+      }
+  
+      // Calculate metrics
+      const totalAccounts = users.length;
+      const adminAccounts = adminUsers.length;
+  
+      // Update your state with the new metrics
       setMetrics(prevMetrics => ({
         ...prevMetrics,
         totalAccounts: totalAccounts,
+        adminAccounts: adminAccounts,
       }));
     };
-
+  
     fetchMetrics();
   }, []);
+  
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
