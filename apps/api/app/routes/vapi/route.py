@@ -331,6 +331,8 @@ async def server_url(
                 
                 shop_name = assistant.agent_config["shop_name"]
                 
+                google_reviews_link = assistant.agent_config["google_reviews_link"]
+                
                 caller_pn = eocReport["call"].get("customer", {}).get("number")
                 
                 assistant_pn = eocReport["phoneNumber"].get("number")
@@ -345,10 +347,39 @@ async def server_url(
                 client = Client(account_sid, auth_token)
                 
                 message = client.messages.create(
-                    body="Here is your review: " + review,
+                    body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us! Listen - if you want to help us out, it would mean a lot if you could leave us a review.",
                     from_=assistant_pn,
                     to=caller_pn
                 )
+                await asyncio.sleep(6)  # Adjust the wait time as needed
+
+                message = client.messages.create(
+                    body="To help you out, I drafted up a little something of a review based on our conversation.",
+                    from_=assistant_pn,
+                    to=caller_pn
+                )
+                await asyncio.sleep(2)  # Adjust the wait time as needed
+
+                message = client.messages.create(
+                    body=review,
+                    from_=assistant_pn,
+                    to=caller_pn
+                )
+                await asyncio.sleep(10)  # Adjust the wait time as needed
+
+                message = client.messages.create(
+                    body=f"I recommend you copy the review so it's handy if you decide to submit it! Here's a link to our Google Reviews page: {google_reviews_link}",
+                    from_=assistant_pn,
+                    to=caller_pn
+                )
+                await asyncio.sleep(5)  # Adjust the wait time as needed
+
+                message = client.messages.create(
+                    body="Thanks for your time today. Goodbye!",
+                    from_=assistant_pn,
+                    to=caller_pn
+                )
+                    
                 
             
             summary = summarize_conversation(db_messages)
