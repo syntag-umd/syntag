@@ -52,6 +52,7 @@ from app.utils import admin_key_header, constant_time_compare
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
 from twilio.rest import Client
+from twilio.http.async_http_client import AsyncTwilioHttpClient
 
 router = APIRouter(prefix="/vapi")
 
@@ -348,11 +349,12 @@ async def server_url(
                 account_sid = settings.TWILIO_ACCOUNT_SID
                 auth_token = settings.TWILIO_AUTH_TOKEN
 
-                client = Client(account_sid, auth_token)
+                http_client = AsyncTwilioHttpClient()
+                client = Client(account_sid, auth_token, http_client=http_client)
 
                 if willing_to_leave_review:
                     # Flow for customers willing to leave a review
-                    message = client.messages.create(
+                    message = await client.messages.create_async(
                         body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us! We’d love it if you could leave us a review - it would mean a lot!",
                         from_=assistant_pn,
                         to=caller_pn
@@ -360,7 +362,7 @@ async def server_url(
                     
                     await asyncio.sleep(2)
 
-                    message = client.messages.create(
+                    message = await client.messages.create_async(
                         body="To help you out, I drafted up a little something of a review based on our conversation.",
                         from_=assistant_pn,
                         to=caller_pn
@@ -368,7 +370,7 @@ async def server_url(
                     
                     await asyncio.sleep(2)
 
-                    message = client.messages.create(
+                    message = await client.messages.create_async(
                         body=review,
                         from_=assistant_pn,
                         to=caller_pn
@@ -376,7 +378,7 @@ async def server_url(
                     
                     await asyncio.sleep(2)
 
-                    message = client.messages.create(
+                    message = await client.messages.create_async(
                         body=f"I recommend you copy the review so it's handy if you decide to submit it! Here's a link to our Google Reviews page: {google_reviews_link}",
                         from_=assistant_pn,
                         to=caller_pn
@@ -384,17 +386,15 @@ async def server_url(
                     
                     await asyncio.sleep(2)
 
-                    message = client.messages.create(
+                    message = await client.messages.create_async(
                         body="Thanks for your time today. Goodbye!",
                         from_=assistant_pn,
                         to=caller_pn
                     )
-                    
-                    await asyncio.sleep(2)
-                    
+                                        
                 else:
                     # Flow for customers not willing to leave a review
-                    message = client.messages.create(
+                    message = await client.messages.create_async(
                         body=f"Hey, this is {shop_name}. Thanks for chatting about your experience with us! If you change your mind and want to leave a review, just let us know!",
                         from_=assistant_pn,
                         to=caller_pn
