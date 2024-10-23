@@ -45,7 +45,7 @@ const AdminDashboard: React.FC = () => {
         console.error("Error fetching users:", userError);
         return;
       }
-  
+    
       // Fetch admin users
       const { data: adminUsers, error: adminError } = await supabase
         .from('user')
@@ -56,14 +56,24 @@ const AdminDashboard: React.FC = () => {
         console.error("Error fetching admin accounts:", adminError);
         return;
       }
+      const { data: voiceBots, error: voiceBotsError } = await supabase
+        .from('voice_assistant')
+        .select('id')
+
+      if(voiceBotsError) {
+        console.error("Error fetching voice assisants: ", voiceBots);
+        return;
+      }
   
       // Calculate metrics
+      const totalAissistants = voiceBots.length;
       const totalAccounts = users.length;
       const adminAccounts = adminUsers.length;
   
       // Update your state with the new metrics
       setMetrics(prevMetrics => ({
         ...prevMetrics,
+        totalAssistants: totalAissistants,
         totalAccounts: totalAccounts,
         adminAccounts: adminAccounts,
       }));
