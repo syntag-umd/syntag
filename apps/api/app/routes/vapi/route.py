@@ -25,6 +25,7 @@ from app.models.enums import (
 from app.models.schemas import GetVapiConfigResponse, AppointmentBookingRequest
 from app.routes.billing.utils import create_account_balance_invoice
 from app.services.analytics.summary import summarize_conversation
+from app.services.analytics.review import extract_review
 from app.services.vapi.generated_models import (
     AssistantOverrides,
     ServerMessageResponseAssistantRequest,
@@ -317,6 +318,39 @@ async def server_url(
                     db.add(db_message)
                     db_messages.append(db_message)
 
+            if assistant.agent_config.get("type") == "squire-review-fetcher":
+                
+                conversation_string = ""
+                
+                for index, message in enumerate(eocReport["messages"]):
+                    
+                    message_content = message.get("message", "")
+                    message_role = message['role']
+                    
+                    conversation_string += f"{message_role}: {message_content}\n"
+                
+                shop_name = assistant.agent_config["shop_name"]
+                
+                caller_pn = eocReport["call"].get("customer", {}).get("number")
+                
+                assistant_pn = eocReport["phoneNumber"].get("number")
+                
+                # make an OpenAI request to fetch a user review from the conversation
+                review = extract_review(conversation_string, shop_name)
+                
+                # Text the review to the caller pn
+                account_sid = settings.TWILIO_ACCOUNT_SID
+                auth_token = settings.TWILIO_AUTH_TOKEN
+                
+                client = Client(account_sid, auth_token)
+                
+                message = client.messages.create(
+                    body="Here is your review: " + review,
+                    from_=assistant_pn,
+                    to=caller_pn
+                )
+                
+            
             summary = summarize_conversation(db_messages)
             conversation.summary = summary
 
