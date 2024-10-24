@@ -23,8 +23,9 @@ const AdminDashboard: React.FC = () => {
     totalAssistants: 0,
     squireAssistants: 0,
     regularAssistants: 0,
-    totalDuration: 0,
+    totalSignInsToday: 0,
     averageDuration: 0,
+    totalUsers: 0, // New metric for Clerk users
   });
 
   const { user, isLoaded } = useUser(); // Use the useUser hook to get user data
@@ -56,24 +57,48 @@ const AdminDashboard: React.FC = () => {
         console.error("Error fetching admin accounts:", adminError);
         return;
       }
+
+      // Fetch voice assistants
       const { data: voiceBots, error: voiceBotsError } = await supabase
         .from('voice_assistant')
         .select('id')
 
       if(voiceBotsError) {
-        console.error("Error fetching voice assisants: ", voiceBots);
+        console.error("Error fetching voice assistants:", voiceBotsError);
         return;
       }
+
+      // Fetch Clerk user data
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('api/getUsers');
+        const data = await response.json();
+        if (response.ok) {
+          setMetrics(prevMetrics => ({
+            ...prevMetrics,
+            totalUsers: data.totalUsers, // Update total Clerk users count
+            totalSignInsToday: data.totalSignedInToday
+          }));
+        } else {
+          console.error("Error fetching Clerk user data:", data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching Clerk user data:", error);
+      }
+    };
+
+      // Call Clerk user data fetch
+      fetchUserData();
   
       // Calculate metrics
-      const totalAissistants = voiceBots.length;
+      const totalAssistants = voiceBots.length;
       const totalAccounts = users.length;
       const adminAccounts = adminUsers.length;
   
       // Update your state with the new metrics
       setMetrics(prevMetrics => ({
         ...prevMetrics,
-        totalAssistants: totalAissistants,
+        totalAssistants: totalAssistants,
         totalAccounts: totalAccounts,
         adminAccounts: adminAccounts,
       }));
@@ -81,7 +106,7 @@ const AdminDashboard: React.FC = () => {
   
     fetchMetrics();
   }, []);
-  
+
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -117,13 +142,13 @@ const AdminDashboard: React.FC = () => {
             <TabPane tab="Home" key="1">
               <Row gutter={16}>
                 <Col span={8}>
+                  <Statistic title="Total Clerk Users" value={metrics.totalUsers} /> {/* New Clerk users metric */}
+                </Col>
+                <Col span={8}>
                   <Statistic title="Total Accounts" value={metrics.totalAccounts} />
                 </Col>
                 <Col span={8}>
                   <Statistic title="Admin Accounts" value={metrics.adminAccounts} />
-                </Col>
-                <Col span={8}>
-                  <Statistic title="Regular Accounts" value={metrics.regularAccounts} />
                 </Col>
                 <Col span={8}>
                   <Statistic title="Squire Accounts" value={metrics.squireAccounts} />
@@ -138,7 +163,7 @@ const AdminDashboard: React.FC = () => {
                   <Statistic title="Regular Assistants" value={metrics.regularAssistants} />
                 </Col>
                 <Col span={8}>
-                  <Statistic title="Total Duration" value={metrics.totalDuration} />
+                  <Statistic title="Total Sign-ins Today" value={metrics.totalSignInsToday} />
                 </Col>
                 <Col span={8}>
                   <Statistic title="Average Duration" value={metrics.averageDuration} />
