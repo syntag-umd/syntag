@@ -36,7 +36,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           build-contexts: |
-            packages=../../packages 
+            packages=./packages 
           context: ./apps/api-proxy
           push: true
           tags: syntagregistryfastapi.azurecr.io/proxy-fast-api:${{ github.sha }}

@@ -36,7 +36,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           build-contexts: |
-            packages=../../packages 
+            packages=./packages 
           context: ./apps/api
           push: true
           tags: syntagregistryfastapi.azurecr.io/api-syntag-images:${{ github.sha }}
