@@ -1,6 +1,7 @@
 import logging
 import time
-from typing import Optional, TypedDict
+from typing import Optional
+from typing_extensions import TypedDict
 from fastapi import HTTPException
 import jwt
 from app.core.config import settings

@@ -1,16 +1,15 @@
-from __future__ import annotations
+from typing import Annotated, TypeVar
+from pydantic import BaseModel
+from pydantic import WrapValidator
 from typing import Any, Dict, List, Optional
 from typing_extensions import TypedDict
 
-from pydantic import BaseModel
+def IgnoreValidationFunc(v, handler, info):
+    """Allows you to use TypedDict and skip run time validation for fastAPI body"""
+    return v
 
-from app.models.utils import IgnoreValidation
-
-
-class Message(TypedDict):
-    role: str
-    content: str  # assistant with tool_calls is blank
-    tool_calls: Optional[List[Any]]
+T = TypeVar("T")
+IgnoreValidation = Annotated[T, WrapValidator(IgnoreValidationFunc)]
 
 
 class Parameters(BaseModel):
@@ -28,10 +27,13 @@ class Tool(BaseModel):
     type: str
     function: Function
 
-
 class Customer(BaseModel):
     number: str
 
+class Message(TypedDict):
+    role: str
+    content: str  # assistant with tool_calls is blank
+    tool_calls: Optional[List[Any]]
 
 class Call(BaseModel):
     id: str
@@ -59,8 +61,7 @@ class PhoneNumber(BaseModel):
     name: Optional[str] = None
     provider: str
 
-
-class ChatRequest(BaseModel):
+class ChatCallRequest(BaseModel):
     model: str
     messages: IgnoreValidation[List[Message]]
     temperature: float

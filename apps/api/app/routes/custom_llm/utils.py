@@ -7,7 +7,7 @@ from typing import Dict, List, Literal, Tuple, Union
 
 from sqlalchemy import text
 from app.models.enums import DEFAULT_TOKEN_COUNT
-from app.models.vapi_schemas import Message
+from nlp_syntag.llm.vapi import Message
 from fastapi.responses import StreamingResponse
 import tiktoken
 from openai import OpenAI, AsyncOpenAI
