@@ -7,7 +7,7 @@ from sqlalchemy import update
 from app.database.tables.conversation import Conversation, ConversationCache
 from app.database.tables.knowledge import Knowledge
 from app.models.enums import ChatMedium, KnowledgeType, Language
-from app.models.vapi_schemas import ChatRequest, Message
+from nlp_syntag.llm.vapi import ChatCallRequest, Message
 from app.database.tables.voice_assistant import VoiceAssistant
 from app.database.tables.chunks import Chunk
 from app.routes.custom_llm.utils import (
@@ -39,7 +39,7 @@ router = APIRouter(prefix="/custom-llm")
 @router.post("/fast/chat/completions")
 async def get_fast_response(
     # request: Request,
-    body: ChatRequest,
+    body: ChatCallRequest,
     db: Session = Depends(get_db),
 ):
     logging.info("===custom llm===")
@@ -311,7 +311,7 @@ async def get_fast_response(
 
 
 @router.post("/manual/chat/completions")
-async def get_manual_response(body: ChatRequest):
+async def get_manual_response(body: ChatCallRequest):
     est_offset = timedelta(hours=-5)
     est = timezone(est_offset)
     current_time = datetime.now(timezone.utc).astimezone(est)
@@ -335,7 +335,7 @@ async def ping_custom_llm(
 
 
 @router.post("/openai/chat/completions")
-async def get_openai_response(body: ChatRequest):
+async def get_openai_response(body: ChatCallRequest):
     completion = await async_openai_client.chat.completions.create(
         model="gpt-4o-mini",
         messages=body.messages,
