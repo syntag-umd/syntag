@@ -1,11 +1,11 @@
-name: Auto deployment for api develop-branch
+name: Auto deployment for api
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
     paths:
       - "apps/api/**"
-      - ".github/workflows/api-BuildAndDeploy-develop.yml"
+      - ".github/workflows/api-BuildAndDeploy.yml"
   workflow_dispatch:
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
             packages=../../packages 
           context: ./apps/api
           push: true
-          tags: syntagregistryfastapi.azurecr.io/fast-api:${{ github.sha }}
+          tags: syntagregistryfastapi.azurecr.io/api-syntag-images:${{ github.sha }}
           
 
       # Step 5: Deploy to Azure Container Apps
@@ -49,9 +49,9 @@ jobs:
           azcliversion: 2.52.0
           inlineScript: |
             az containerapp update \
-              --name api-develop-syntag \
+              --name api-syntag \
               --resource-group syntag-resources \
-              --image syntagregistryfastapi.azurecr.io/fast-api:${{ github.sha }} \
+              --image syntagregistryfastapi.azurecr.io/api-syntag-images:${{ github.sha }} \
               --registry-server syntagregistryfastapi.azurecr.io \
               --registry-username ${{ secrets.SYNTAGREGISTRYFASTAPI_USERNAME }} \
               --registry-password ${{ secrets.SYNTAGREGISTRYFASTAPI_PASSWORD }}
