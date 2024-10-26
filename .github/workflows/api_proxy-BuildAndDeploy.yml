@@ -51,7 +51,4 @@ jobs:
             az containerapp update \
               --name proxy-fast-api \
               --resource-group syntag-resources \
-              --image syntagregistryfastapi.azurecr.io/proxy-fast-api:${{ github.sha }} \
-              --registry-server syntagregistryfastapi.azurecr.io \
-              --registry-username ${{ secrets.SYNTAGREGISTRYFASTAPI_USERNAME }} \
-              --registry-password ${{ secrets.SYNTAGREGISTRYFASTAPI_PASSWORD }}
+              --image syntagregistryfastapi.azurecr.io/proxy-fast-api:${{ github.sha }} 
