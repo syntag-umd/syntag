@@ -509,7 +509,22 @@ async def server_url(
                 )
 
                 async with BarberBookingClient(None, shop_name) as client:
-                    prompt = await client.get_prompt()
+                    prompt_and_assistant_config = await client.get_prompt_and_assistant_config()
+                    
+                    barber_names_to_ids = assistant_config["barber_names_to_ids"]
+                    services = assistant_config["services"]
+                    timezone_str = assistant_config["timezone"]
+                    
+                    # Fetch the current assistant config, update the entries and push to db
+                    assistant_config["barber_names_to_ids"] = barber_names_to_ids
+                    assistant_config["services"] = services
+                    assistant_config["timezone"] = timezone_str
+                    
+                    db_phone_number.voice_assistant.agent_config = assistant_config
+                    
+                    db.commit()
+                    
+                    prompt = prompt_and_assistant_config["prompt"]
                     prompt.format(assistant_name=db_phone_number.voice_assistant.name)
 
                     messages.append({"role": "system", "content": prompt})
@@ -606,7 +621,7 @@ async def server_url(
                     shop_name = assistant_config["shop_name"]
                     
                     barber_names_to_ids = assistant_config["barber_names_to_ids"]
-                    haircut_services = assistant_config["haircut_services"]
+                    haircut_services = assistant_config.get("haircut_services", ["haircut", "Haircut", "HAIRCUT"])
                     
                     services = function_args.get("services", haircut_services)
                     barbers = function_args.get("barbers", list(barber_names_to_ids.keys()))
@@ -620,7 +635,6 @@ async def server_url(
                     
                     # Get the next available time
                     next_openings = await client.get_next_n_openings(timezone_str, services, barber_ids, n_next_openings)
-                    
                     
                     if next_openings:
                         
