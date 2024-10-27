@@ -47,7 +47,7 @@ from app.utils import (
     get_user_from_req,
 )
 from app.routes.vapi.utils import standardize_time
-from app.routes.vapi.tools import create_appointment_tool, create_fetch_next_opening_tool
+from app.routes.vapi.tools import create_appointment_tool, create_fetch_next_opening_tool, create_fetch_availability_on_day_tool
 from app.utils import admin_key_header, constant_time_compare
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
@@ -507,6 +507,10 @@ async def server_url(
                 fetch_next_opening_tool = create_fetch_next_opening_tool(
                     service_types, barber_names
                 )
+                
+                fetch_availability_on_day_tool = create_fetch_availability_on_day_tool(
+                    service_types, barber_names
+                )
 
                 async with BarberBookingClient(None, shop_name) as client:
                     prompt_and_assistant_config = await client.get_prompt_and_assistant_config()
@@ -529,7 +533,7 @@ async def server_url(
 
                     messages.append({"role": "system", "content": prompt})
                     model["messages"] = messages
-                    model["tools"] = [appointment_tool, fetch_next_opening_tool]
+                    model["tools"] = [appointment_tool, fetch_next_opening_tool, fetch_availability_on_day_tool]    
 
                     return ServerMessageResponse(
                         messageResponse=ServerMessageResponseAssistantRequest(
@@ -664,7 +668,53 @@ async def server_url(
                     results.append(result)
                 
                 elif function_name == "fetch_availability_on_day":
-                    pass
+                    
+                    timezone_str = assistant_config["timezone"]
+                    shop_name = assistant_config["shop_name"]
+                    
+                    barber_names_to_ids = assistant_config["barber_names_to_ids"]
+                    haircut_services = assistant_config.get("haircut_services", ["haircut", "Haircut", "HAIRCUT"])
+                    
+                    services = function_args.get("services", haircut_services)
+                    barbers = function_args.get("barbers", list(barber_names_to_ids.keys()))
+                    days_ahead = function_args.get("days_ahead", 1)
+                    
+                    # ignore barbers that are not in the shop
+                    barber_ids = [barber_names_to_ids.get(barber) for barber in barbers if barber_names_to_ids.get(barber) is not None]
+                    
+                    booking_client = BarberBookingClient(shop_name=shop_name)
+                    
+                    n_next_openings = 3
+                    
+                    # Get the next available time
+                    next_openings = await client.get_next_n_openings(timezone_str, services, barber_ids, n_next_openings, days_ahead)
+                    
+                    if next_openings:
+                        
+                        next_opening_times = [opening["time"] for opening in next_openings]
+                        
+                        # format like so: "Our next available slots are <time1>, <time2>, and <time3>"
+                        
+                        if len(next_openings) > 1:
+                            next_openings_str = ", ".join(next_opening_times[:-1])
+                            next_openings_str += f", and {next_opening_times[-1]}"
+                        else:
+                            next_openings_str = next_opening_times[0]
+                        
+                        message = f"Our next available slots are {next_openings_str}"
+                        
+                        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: " + message
+                        
+                    else:
+                        
+                        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: Sorry, we don't have any available slots right now. Should I check for slots on another day?"
+                        
+                    result = ToolCallResult(
+                        toolCallId=tool_call_id,
+                        name=function_name,
+                        result=response_coercing_string,
+                    )
+                    results.append(result)
                 
                 elif function_name == "check_availability_on_day_and_time":
                     pass
