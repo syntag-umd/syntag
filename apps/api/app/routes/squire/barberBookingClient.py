@@ -7,6 +7,8 @@ from collections import defaultdict
 import pytz
 from itertools import groupby
 
+from app.routes.squire.defaultPrompt import build_default_prompt
+
 
 class BarberBookingClient:
     def __init__(self, booking_link: Optional[str], shop_name: Optional[str] = None):
