@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "umd-call-center"
+version = "0.1.0"
+description = "demo for UMD's call center"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.9"
+langchain-community = "^0.3.3"
+langchain-core = "^0.3.13"
+ipykernel = "^6.29.5"
+python-dotenv = "^1.0.1"
+azure-ai-documentintelligence = "^1.0.0b4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
