@@ -512,12 +512,12 @@ async def server_url(
                     prompt_and_assistant_config = await client.get_prompt_and_assistant_config()
                     
                     barber_names_to_ids = assistant_config["barber_names_to_ids"]
-                    services = assistant_config["services"]
+                    services = assistant_config["service_types"]
                     timezone_str = assistant_config["timezone"]
                     
                     # Fetch the current assistant config, update the entries and push to db
                     assistant_config["barber_names_to_ids"] = barber_names_to_ids
-                    assistant_config["services"] = services
+                    assistant_config["service_types"] = services
                     assistant_config["timezone"] = timezone_str
                     
                     db_phone_number.voice_assistant.agent_config = assistant_config
