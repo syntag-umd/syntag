@@ -13,8 +13,8 @@ router = APIRouter(prefix="/squire")
 @router.get("/shop/{shop_name}/prompt")
 async def get_prompt(shop_name: str):
     async with BarberBookingClient(None, shop_name) as client:
-        prompt = await client.get_prompt()
-        return prompt
+        prompt_and_config = await client.get_prompt_and_assistant_config()
+        return prompt["prompt"]
 
 
 @router.post("/shop/{shop_name}/book")

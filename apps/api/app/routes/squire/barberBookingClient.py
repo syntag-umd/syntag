@@ -7,6 +7,8 @@ from collections import defaultdict
 import pytz
 from itertools import groupby
 
+from app.routes.squire.defaultPrompt import build_default_prompt
+
 
 class BarberBookingClient:
     def __init__(self, booking_link: Optional[str], shop_name: Optional[str] = None):
@@ -185,15 +187,20 @@ class BarberBookingClient:
 
         return prompt
 
-    async def get_prompt(self):
+    async def get_prompt_and_assistant_config(self):
         prompt = ""
 
         start_time = datetime.now().strftime("%Y-%m-%d")
         end_time = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+        
+        barber_names_to_ids = {}
 
         fetch_services_tasks = []
         for barber_name, barber_info in self.barbers.items():
             barber_id = barber_info["id"]
+            
+            barber_names_to_ids[barber_name] = barber_id
+            
             barber_min_service_length = barber_info["min_service_length"]
             task = self.fetch_services(barber_id, barber_name)
             fetch_services_tasks.append(
@@ -231,7 +238,7 @@ class BarberBookingClient:
         service_list_string = ", ".join(unique_services)
         timezone = self.shop_timezone or "UTC"
 
-        starter_prompt = build_default_prompt(
+        starter_prompt = build_default_prompt_and_fetch_config_info(
             self.shop_canonical_name, barber_list_string, service_list_string, timezone
         )
 
@@ -299,7 +306,12 @@ class BarberBookingClient:
                 )
                 prompt += "\n"
 
-        return prompt
+        return {
+            "prompt": prompt,
+            "barber_names_to_ids": barber_names_to_ids,
+            "services": unique_services,
+            "timezone": timezone,
+        }
     
     def extract_available_times(self, availability_data, target_tz_str):
         # Returns a list of datetime objects representing available times in target timezone
