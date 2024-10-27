@@ -332,14 +332,13 @@ class BarberBookingClient:
         return available_times
 
 
-    async def get_next_n_openings(self, timezone_str: str, services_list: List[str], barber_ids: List[str], n: int):
+    async def get_next_n_openings(self, timezone_str: str, services_list: List[str], barber_ids: List[str], n: int, n_days_ahead: int = 0):
         openings = []
         now_utc = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
         now_target_tz = now_utc.astimezone(ZoneInfo(timezone_str))
-        start_date = now_target_tz.date()
+        start_date = now_target_tz.date() + timedelta(days=n_days_ahead)
         start_time = start_date.strftime("%Y-%m-%d")
-        end_date = now_target_tz + timedelta(days=7)  # Adjust as needed
-        end_time = end_date.strftime("%Y-%m-%d")
+        end_time = start_time
 
         for barber_id in barber_ids:
             # Get barber_name
