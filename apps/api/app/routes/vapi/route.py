@@ -47,7 +47,7 @@ from app.utils import (
     get_user_from_req,
 )
 from app.routes.vapi.utils import standardize_time
-from app.routes.vapi.tools import create_appointment_tool
+from app.routes.vapi.tools import create_appointment_tool, create_fetch_next_opening_tool
 from app.utils import admin_key_header, constant_time_compare
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
@@ -451,9 +451,11 @@ async def server_url(
                 )
             )
             db_phone_number = db.execute(query).scalar()
+            
 
             if not db_phone_number:
                 raise HTTPException(status_code=400, detail="Phone number not found")
+            
 
             if not db_phone_number.voice_assistant:
                 logging.error("No assistant found for phone number")
@@ -462,16 +464,19 @@ async def server_url(
                         error="This phone number is not associated with an assistant. Goodbye",
                     )
                 )
-
+                
+            assistant_config = db_phone_number.voice_assistant.agent_config
             user = db_phone_number.user
+            
             if user.account_balance <= 0:
                 return ServerMessageResponse(
                     messageResponse=ServerMessageResponseAssistantRequest(
                         error="The number you are calling is out of money. Goodbye",
                     )
                 )
+                
 
-            if db_phone_number.voice_assistant.agent_config.get("type") == "squire":
+            if assistant_config.get("type") == "squire":
                 vapi_config = db_phone_number.voice_assistant.vapi_config
                 if not vapi_config:
                     logging.error("No vapi_config found for squire agent")
@@ -485,7 +490,11 @@ async def server_url(
                 # messages = model.get("messages", [])
                 messages = []
 
-                shop_name = db_phone_number.voice_assistant.agent_config["shop_name"]
+                shop_name = assistant_config["shop_name"]
+                service_types = assistant_config["service_types"]
+                barber_name_to_ids = assistant_config["barber_names_to_ids"]
+                
+                barber_names = list(barber_name_to_ids.keys())
 
                 print(assistantRequest)
 
@@ -494,6 +503,10 @@ async def server_url(
                 appointment_tool = create_appointment_tool(
                     shop_name, callee_phone_number
                 )
+                
+                fetch_next_opening_tool = create_fetch_next_opening_tool(
+                    service_types, barber_names
+                )
 
                 async with BarberBookingClient(None, shop_name) as client:
                     prompt = await client.get_prompt()
@@ -501,7 +514,7 @@ async def server_url(
 
                     messages.append({"role": "system", "content": prompt})
                     model["messages"] = messages
-                    model["tools"] = [appointment_tool]
+                    model["tools"] = [appointment_tool, fetch_next_opening_tool]
 
                     return ServerMessageResponse(
                         messageResponse=ServerMessageResponseAssistantRequest(
@@ -532,7 +545,22 @@ async def server_url(
             )
 
         elif message_type == "tool-calls":
+            
             toolMessage: ServerMessageToolCalls = body["message"]
+            
+            assistant = (
+                db.query(VoiceAssistant)
+                .filter(
+                    VoiceAssistant.vapi_assistant_id == toolMessage["call"]["assistantId"]
+                )
+                .options(
+                    selectinload(VoiceAssistant.phone_number),
+                    selectinload(VoiceAssistant.user),
+                )
+                .first()
+            )
+            
+            assistant_config = assistant.agent_config
 
             utc_time = datetime.utcnow()
             eastern_offset = timedelta(hours=-4)
@@ -572,6 +600,63 @@ async def server_url(
                         # message does not work
                     )
                     results.append(result)
+                    
+                elif function_name == "fetch_next_opening":
+                    timezone_str = assistant_config["timezone"]
+                    shop_name = assistant_config["shop_name"]
+                    
+                    barber_names_to_ids = assistant_config["barber_names_to_ids"]
+                    haircut_services = assistant_config["haircut_services"]
+                    
+                    services = function_args.get("services", haircut_services)
+                    barbers = function_args.get("barbers", list(barber_names_to_ids.keys()))
+                    
+                    # ignore barbers that are not in the shop
+                    barber_ids = [barber_names_to_ids.get(barber) for barber in barbers if barber_names_to_ids.get(barber) is not None]
+                    
+                    booking_client = BarberBookingClient(shop_name=shop_name)
+                    
+                    n_next_openings = 3
+                    
+                    # Get the next available time
+                    next_openings = await client.get_next_n_openings(timezone_str, services, barber_ids, n_next_openings)
+                    
+                    
+                    if next_openings:
+                        
+                        next_opening_times = [opening["time"] for opening in next_openings]
+                        
+                        # format like so: "Our next available slots are <time1>, <time2>, and <time3>"
+                        
+                        if len(next_openings) > 1:
+                            next_openings_str = ", ".join(next_opening_times[:-1])
+                            next_openings_str += f", and {next_opening_times[-1]}"
+                        else:
+                            next_openings_str = next_opening_times[0]
+                        
+                        message = f"Our next available slots are {next_openings_str}"
+                        
+                        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: " + message
+                        
+                    else:
+                        
+                        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: Sorry, we don't have any available slots right now. Should I check for slots tomorrow?"
+                        
+                    result = ToolCallResult(
+                        toolCallId=tool_call_id,
+                        name=function_name,
+                        result=response_coercing_string,
+                    )
+                    results.append(result)
+                
+                elif function_name == "fetch_availability_on_day":
+                    pass
+                
+                elif function_name == "check_availability_on_day_and_time":
+                    pass
+                
+                elif function_name == "check_for_walkin_availability":
+                    pass
 
                 elif function_name == "book_squire_appointment":
 
