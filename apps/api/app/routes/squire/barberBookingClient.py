@@ -1,10 +1,11 @@
 import asyncio
-from typing import Optional
+from typing import Optional, List
 import aiohttp
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from collections import defaultdict
-from app.routes.squire.defaultPrompt import build_default_prompt
+import pytz
+from itertools import groupby
 
 
 class BarberBookingClient:
@@ -299,3 +300,99 @@ class BarberBookingClient:
                 prompt += "\n"
 
         return prompt
+    
+    def extract_available_times(self, availability_data, target_tz_str):
+        # Returns a list of datetime objects representing available times in target timezone
+        available_times = []
+        time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+        target_tz = ZoneInfo(target_tz_str)
+        for day_info in availability_data:
+            if day_info["availability"] > 0:
+                times = day_info["times"]
+                for period in ["morning", "afternoon", "evening"]:
+                    for time_slot in times.get(period, []):
+                        if time_slot["available"]:
+                            time_str = time_slot["time"]
+                            time_obj = datetime.strptime(time_str, time_format)
+                            # The time from API is in UTC
+                            time_obj = time_obj.replace(tzinfo=ZoneInfo("UTC")).astimezone(target_tz)
+                            available_times.append(time_obj)
+        return available_times
+
+
+    async def get_next_n_openings(self, timezone_str: str, services_list: List[str], barber_ids: List[str], n: int):
+        openings = []
+        now_utc = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
+        now_target_tz = now_utc.astimezone(ZoneInfo(timezone_str))
+        start_date = now_target_tz.date()
+        start_time = start_date.strftime("%Y-%m-%d")
+        end_date = now_target_tz + timedelta(days=7)  # Adjust as needed
+        end_time = end_date.strftime("%Y-%m-%d")
+
+        for barber_id in barber_ids:
+            # Get barber_name
+            barber_name = None
+            for name, info in self.barbers.items():
+                if info['id'] == barber_id:
+                    barber_name = name
+                    break
+            if not barber_name:
+                continue  # Barber not found
+
+            # Fetch services
+            barber_services = await self.fetch_services(barber_id, barber_name)
+            services_json = barber_services[1]
+            processed_services = self.process_services(services_json)
+
+            # Filter services
+            matching_services = [s for s in processed_services if s['service_name'].strip() in [s.strip() for s in services_list]]
+
+            if not matching_services:
+                continue  # Barber does not offer the desired services
+
+            for service in matching_services:
+                service_id = service['id']
+                service_name = service['service_name']
+                duration = service['duration']
+
+                # Fetch availability
+                availability_data = await self.fetch_availability(barber_id, start_time, end_time, duration)
+
+                # Extract available times
+                available_times = self.extract_available_times(availability_data, timezone_str)
+
+                for available_time in available_times:
+                    weekday_name = available_time.strftime('%A')
+                    time_str = available_time.strftime('%I:%M %p')
+                    openings.append({
+                        'barber_id': barber_id,
+                        'barber_name': barber_name,
+                        'service_id': service_id,
+                        'service_name': service_name,
+                        'weekday': weekday_name,
+                        'time': time_str,
+                        'datetime': available_time,  # For accurate sorting
+                    })
+
+        # Sort openings by datetime
+        openings.sort(key=lambda x: x['datetime'])
+
+        # Collect up to n unique times with one opening per time
+        unique_openings = []
+        seen_datetimes = set()
+
+        for opening in openings:
+            dt = opening['datetime']
+            if dt not in seen_datetimes:
+                seen_datetimes.add(dt)
+                # Remove 'datetime' field as it's no longer needed
+                del opening['datetime']
+                unique_openings.append(opening)
+                if len(unique_openings) == n:
+                    break
+
+        return unique_openings
+
+
+
+
