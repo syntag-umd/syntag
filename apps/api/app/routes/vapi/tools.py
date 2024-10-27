@@ -66,11 +66,11 @@ def create_fetch_availability_on_day_tool(service_types, barber_names):
                         "items": {"type": "string"},
                     },
                     "days_ahead": {
-                        "description": "The number of days ahead to check availability for. This parameter is optional and defaults to 1. 1 implies checking availability for tomorrow, 2 implies checking availability for the day after tomorrow, and so on.",
+                        "description": "The number of days ahead to check availability for. 1 implies checking availability for tomorrow, 2 implies checking availability for the day after tomorrow, and so on.",
                         "type": "integer",
                     },  
                 },
-                "required": [],
+                "required": ["days_ahead"],
             },
         },
     }
