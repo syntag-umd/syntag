@@ -238,7 +238,7 @@ class BarberBookingClient:
         service_list_string = ", ".join(unique_services)
         timezone = self.shop_timezone or "UTC"
 
-        starter_prompt = build_default_prompt_and_fetch_config_info(
+        starter_prompt = build_default_prompt(
             self.shop_canonical_name, barber_list_string, service_list_string, timezone
         )
 
