@@ -47,7 +47,12 @@ from app.utils import (
     get_user_from_req,
 )
 from app.routes.vapi.utils import standardize_time
-from app.routes.vapi.tools import create_appointment_tool, create_fetch_next_opening_tool, create_fetch_availability_on_day_tool
+from app.routes.vapi.tools import (
+    create_appointment_tool, 
+    create_fetch_next_opening_tool, 
+    create_fetch_availability_on_day_tool, 
+    create_check_walkin_availability_tool
+)
 from app.utils import admin_key_header, constant_time_compare
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
@@ -452,7 +457,6 @@ async def server_url(
             )
             db_phone_number = db.execute(query).scalar()
             
-
             if not db_phone_number:
                 raise HTTPException(status_code=400, detail="Phone number not found")
             
@@ -511,6 +515,8 @@ async def server_url(
                 fetch_availability_on_day_tool = create_fetch_availability_on_day_tool(
                     service_types, barber_names
                 )
+                
+                check_walkin_availability_tool = create_check_walkin_availability_tool()
 
                 async with BarberBookingClient(None, shop_name) as client:
                     prompt_and_assistant_config = await client.get_prompt_and_assistant_config()
@@ -518,6 +524,7 @@ async def server_url(
                     barber_names_to_ids = assistant_config["barber_names_to_ids"]
                     services = assistant_config["service_types"]
                     timezone_str = assistant_config["timezone"]
+                    extra_prompts = assistant_config.get("extra_prompts", [])
                     
                     # Fetch the current assistant config, update the entries and push to db
                     assistant_config["barber_names_to_ids"] = barber_names_to_ids
@@ -530,10 +537,19 @@ async def server_url(
                     
                     prompt = prompt_and_assistant_config["prompt"]
                     prompt.format(assistant_name=db_phone_number.voice_assistant.name)
+                    
+                    for message in prompt_and_assistant_config["extra_prompts"]:
+                        prompt += "\n" + message 
 
                     messages.append({"role": "system", "content": prompt})
+                    
                     model["messages"] = messages
-                    model["tools"] = [appointment_tool, fetch_next_opening_tool, fetch_availability_on_day_tool]    
+                    model["tools"] = [
+                        appointment_tool, 
+                        fetch_next_opening_tool, 
+                        fetch_availability_on_day_tool,
+                        check_walkin_availability_tool
+                    ] 
 
                     return ServerMessageResponse(
                         messageResponse=ServerMessageResponseAssistantRequest(

@@ -11,7 +11,7 @@ from app.routes.squire.defaultPrompt import build_default_prompt
 
 
 class BarberBookingClient:
-    def __init__(self, booking_link: Optional[str], shop_name: Optional[str] = None):
+    def __init__(self, booking_link: Optional[str] = None, shop_name: Optional[str] = None):
         if not booking_link:
             if not shop_name:
                 raise ValueError("Either booking_link or shop_name must be provided")
@@ -404,6 +404,39 @@ class BarberBookingClient:
 
         return unique_openings
 
+    async def are_walkins_allowed(self) -> bool:
+        # Get current time in shop timezone
+        timezone_str = self.shop_timezone or 'UTC'
+        now_utc = datetime.utcnow().replace(tzinfo=ZoneInfo('UTC'))
+        now_shop_tz = now_utc.astimezone(ZoneInfo(timezone_str))
+        now_plus_150 = now_shop_tz + timedelta(minutes=150)
+        start_time = now_shop_tz.strftime('%Y-%m-%d')
+        end_time = start_time  # Only today
 
+        # Initialize set to collect unique available times
+        unique_times = set()
 
+        # Collect fetch_availability tasks for each barber using their minimum service length
+        fetch_availability_tasks = []
+        for barber_name, barber_info in self.barbers.items():
+            barber_id = barber_info['id']
+            min_service_length = barber_info['min_service_length'] or 15  # Default to 15 if None
+            duration = min_service_length
+            task = self.fetch_availability(barber_id, start_time, end_time, duration)
+            fetch_availability_tasks.append((barber_id, task))
 
+        # Await all fetch_availability tasks concurrently
+        availability_results = await asyncio.gather(*(task for _, task in fetch_availability_tasks))
+
+        # Process availability data
+        for (barber_id, _), availability_data in zip(fetch_availability_tasks, availability_results):
+            times = self.extract_available_times(availability_data, timezone_str)
+            for time in times:
+                if now_shop_tz <= time <= now_plus_150:
+                    unique_times.add(time)
+
+        # Count the number of unique times
+        num_unique_times = len(unique_times)
+
+        # Return True if there are more than 4 unique times, else False
+        return num_unique_times > 4
