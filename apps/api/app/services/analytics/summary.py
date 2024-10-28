@@ -1,11 +1,8 @@
 import logging
 from typing import List
-
-from openai import AsyncOpenAI
 from app.database.tables.message import Message
 from app.models.enums import Role
 from app.utils import get_token_count
-from apps.api.app.core.config import Settings
 from app.services.openai.utils import async_openai_client
 
 async def summarize_conversation(db_messages: List[Message]):
