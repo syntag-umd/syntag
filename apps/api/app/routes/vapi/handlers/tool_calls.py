@@ -146,16 +146,16 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
     print("Services", services)
     print("Barber IDs", barber_ids)
 
-    booking_client = BarberBookingClient(shop_name=shop_name)
-
     n_next_openings = 3
 
-    # Get the next available time
-    next_openings = await booking_client.get_next_n_openings(
-        timezone_str, services, barber_ids, n_next_openings
-    )
-    
-    print("Next openings", next_openings)
+    # Use 'async with' for the booking client
+    async with BarberBookingClient(shop_name=shop_name) as booking_client:
+        # Get the next available time
+        next_openings = await booking_client.get_next_n_openings(
+            timezone_str, services, barber_ids, n_next_openings
+        )
+        
+        print("Next openings", next_openings)
 
     if next_openings:
         next_opening_times = [opening["time"] for opening in next_openings]
@@ -184,6 +184,7 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
     return result
 
 
+
 async def handle_fetch_availability_on_day(tool_call_id, function_args, assistant_config):
     timezone_str = assistant_config["timezone"]
     shop_name = assistant_config["shop_name"]
@@ -203,29 +204,28 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
         for barber in barbers
         if barber_names_to_ids.get(barber) is not None
     ]
-    
+
     print("Timezone", timezone_str)
     print("Shop name", shop_name)
     print("Services", services)
     print("Barber IDs", barber_ids)
     print("Days ahead", days_ahead)
-    
-
-    booking_client = BarberBookingClient(shop_name=shop_name)
 
     n_next_openings = 3
 
-    # Get the next available time
-    next_openings = await booking_client.get_next_n_openings(
-        timezone_str, services, barber_ids, n_next_openings, days_ahead
-    )
-    
+    # Use async with for the booking client
+    async with BarberBookingClient(shop_name=shop_name) as booking_client:
+        # Get the next available time
+        next_openings = await booking_client.get_next_n_openings(
+            timezone_str, services, barber_ids, n_next_openings, days_ahead
+        )
+
     print("Next openings", next_openings)
 
     if next_openings:
         next_opening_times = [opening["time"] for opening in next_openings]
 
-        # Format like so: "Our next available slots are <time1>, <time2>, and <time3>"
+        # Format the available slots
         if len(next_openings) > 1:
             next_openings_str = ", ".join(next_opening_times[:-1])
             next_openings_str += f", and {next_opening_times[-1]}"
@@ -249,6 +249,7 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
     return result
 
 
+
 async def handle_check_availability_on_day_and_time(
     tool_call_id, function_args, assistant_config
 ):
@@ -268,11 +269,10 @@ async def handle_check_availability_on_day_and_time(
     else:
         barber_id = None
 
-    booking_client = BarberBookingClient(shop_name=shop_name)
-
-    availability = await booking_client.get_barber_for_appointment(
-        day_str, time_str, services_list, barber_id
-    )
+    async with BarberBookingClient(shop_name=shop_name) as booking_client:
+        availability = await booking_client.get_barber_for_appointment(
+            day_str, time_str, services_list, barber_id
+        )
 
     if availability:
         barber_name, service_name = availability
@@ -300,33 +300,34 @@ async def handle_check_availability_on_day_and_time(
     return result
 
 
+
 async def handle_check_for_walkin_availability(
     tool_call_id, function_args, assistant_config
 ):
     shop_name = assistant_config["shop_name"]
 
-    booking_client = BarberBookingClient(shop_name=shop_name)
+    async with BarberBookingClient(shop_name=shop_name) as booking_client:
+        walkins_allowed = await booking_client.are_walkins_allowed()
 
-    walkins_allowed = await booking_client.are_walkins_allowed()
+        if walkins_allowed:
+            response_coercing_string = (
+                "YOUR RESPONSE MUST BE THE FOLLOWING: We are currently taking walk-ins "
+                "since our barbers aren't that busy right now. However, we recommend "
+                "booking an appointment to ensure you get a slot!"
+            )
+        else:
+            response_coercing_string = (
+                "YOUR RESPONSE MUST BE THE FOLLOWING: We are currently not taking walk-ins "
+                "right now. Would you like to book an appointment?"
+            )
 
-    if walkins_allowed:
-        response_coercing_string = (
-            "YOUR RESPONSE MUST BE THE FOLLOWING: We are currently taking walk-ins "
-            "since our barbers aren't that busy right now. However, we recommend "
-            "booking an appointment to ensure you get a slot!"
+        result = ToolCallResult(
+            toolCallId=tool_call_id,
+            name="check_for_walkin_availability",
+            result=response_coercing_string,
         )
-    else:
-        response_coercing_string = (
-            "YOUR RESPONSE MUST BE THE FOLLOWING: We are currently not taking walk-ins "
-            "right now. Would you like to book an appointment?"
-        )
+        return result
 
-    result = ToolCallResult(
-        toolCallId=tool_call_id,
-        name="check_for_walkin_availability",
-        result=response_coercing_string,
-    )
-    return result
 
 
 async def handle_book_squire_appointment(
