@@ -538,7 +538,7 @@ async def server_url(
                     prompt = prompt_and_assistant_config["prompt"]
                     prompt.format(assistant_name=db_phone_number.voice_assistant.name)
                     
-                    for message in prompt_and_assistant_config["extra_prompts"]:
+                    for message in extra_prompts:
                         prompt += "\n" + message 
 
                     messages.append({"role": "system", "content": prompt})
