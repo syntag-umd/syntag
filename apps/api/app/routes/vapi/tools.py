@@ -159,7 +159,7 @@ def create_appointment_tool(shop_name, phone_number):
         },
         "function": {
             "name": "book_squire_appointment",
-            "description": "This function allows booking an appointment with a specified barber and service at a given time. This function needs to be called to book an appointment. Before booking an appointment, collect the necessary fields from the user. Don't forget to collect their first name and last name. Then, ask if the phone number they are calling from is fine to text. If not, just ask for their number - you can format it by yourself without asking them about a specific format."
+            "description": "This function allows booking an appointment with a specified barber and service at a given time. This function needs to be called to book an appointment. Before booking an appointment, collect the necessary fields from the user. Don't forget to collect their first name and last name. Then, ask if the phone number they are calling from is fine to text. If not, just ask for their number - you can format it by yourself without asking them about a specific format.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -196,7 +196,7 @@ def create_appointment_tool(shop_name, phone_number):
                     #     "type": "string",
                     # },
                     "phoneNumber": {
-                        "description": f"The phone number of the client to contact or send updates regarding the appointment. Only provide this argument if the user doesn't want you texting them at the number they are calling from. Provide in the format +1XXXXXXXXXX, but don't ask the user about this format."
+                        "description": f"The phone number of the client to contact or send updates regarding the appointment. Only provide this argument if the user doesn't want you texting them at the number they are calling from. Provide in the format +1XXXXXXXXXX, but don't ask the user about this format.", 
                         "type": "string",
                     },
                 },
