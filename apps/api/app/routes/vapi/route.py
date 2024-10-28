@@ -8,7 +8,7 @@ from app.database.tables.user import User
 from app.models.enums import Language
 from app.services.vapi.utils import vapi_secret_header
 from app.models.schemas import GetVapiConfigResponse
-from app.utils import get_user_from_req, admin_key_header
+from app.utils import fetch_vapi_model, fetch_vapi_voice, get_user_from_req, admin_key_header
 from app.services.vapi.generated_models import ServerMessage, ServerMessageResponse
 from app.models.utils import IgnoreValidation
 

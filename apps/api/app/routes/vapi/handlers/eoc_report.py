@@ -201,7 +201,7 @@ async def handle_squire_review_fetcher(eocReport, assistant):
     assistant_pn = eocReport["phoneNumber"].get("number")
 
     # make an OpenAI request to fetch a user review from the conversation
-    review_details = extract_review(conversation_string, shop_name)
+    review_details = await extract_review(conversation_string, shop_name)
 
     # extract the review, and their willingness to review
     review = review_details["review"]
@@ -211,8 +211,8 @@ async def handle_squire_review_fetcher(eocReport, assistant):
     account_sid = settings.TWILIO_ACCOUNT_SID
     auth_token = settings.TWILIO_AUTH_TOKEN
 
-    http_client = AsyncTwilioHttpClient()
-    client = Client(account_sid, auth_token, http_client=http_client)
+    ahttp_client = AsyncTwilioHttpClient()
+    client = Client(account_sid, auth_token, http_client=ahttp_client)
 
     if willing_to_leave_review:
         # Flow for customers willing to leave a review
@@ -272,7 +272,7 @@ async def handle_end_of_call_report(eocReport: ServerMessageEndOfCallReport, db:
     if assistant and assistant.agent_config.get("type") == "squire-review-fetcher":
         await handle_squire_review_fetcher(eocReport, assistant)
 
-    summary = summarize_conversation(db_messages)
+    summary = await summarize_conversation(db_messages)
     conversation.summary = summary
 
     update_user_account(conversation, callLengthSeconds, user, db)

@@ -1,12 +1,14 @@
-import openai
+from openai import AsyncOpenAI
 import logging
 from pydantic import BaseModel
+from app.core.config import settings
+from app.services.openai.utils import async_openai_client
 
 class TranscriptReview(BaseModel):
     review: str
     willing_to_leave_review: bool
 
-def extract_review(conversation: str, shop_name: str):
+async def extract_review(conversation: str, shop_name: str):
     """Extracts both the review content and whether the user was willing to leave a review."""
     model = "gpt-4o-mini"
     
@@ -25,7 +27,7 @@ def extract_review(conversation: str, shop_name: str):
     ]
     
     try:
-        completion = openai.chat.completions.create(
+        completion = await async_openai_client.chat.completions.create(
             model=model,
             messages=message_dicts,
             temperature=0.3
@@ -33,7 +35,7 @@ def extract_review(conversation: str, shop_name: str):
         
         completion_content = completion.choices[0].message.content
         
-        parsed_completion = openai.beta.chat.completions.parse(
+        parsed_completion =await async_openai_client.beta.chat.completions.parse(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "Extract the review and the user's willingness to leave a review."},

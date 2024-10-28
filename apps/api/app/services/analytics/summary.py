@@ -1,13 +1,14 @@
 import logging
 from typing import List
 
-import openai
+from openai import AsyncOpenAI
 from app.database.tables.message import Message
 from app.models.enums import Role
 from app.utils import get_token_count
+from apps.api.app.core.config import Settings
+from app.services.openai.utils import async_openai_client
 
-
-def summarize_conversation(db_messages: List[Message]):
+async def summarize_conversation(db_messages: List[Message]):
     """Summarizes based on the beginning and end of the conversation"""
     model = "gpt-4o-mini"
     cur_tokens = 0
@@ -62,7 +63,7 @@ def summarize_conversation(db_messages: List[Message]):
     else:
         transcript = "".join(start_content) + "".join(end_content)
     try:
-        summary = openai.chat.completions.create(
+        summary = await async_openai_client.chat.completions.create(
             model=model,
             messages=[
                 {

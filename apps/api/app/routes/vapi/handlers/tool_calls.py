@@ -15,6 +15,7 @@ from app.services.vapi.generated_models import (
 )
 from app.routes.vapi.utils import format_time_readable, standardize_time
 from twilio.rest import Client
+from twilio.http.async_http_client import AsyncTwilioHttpClient
 
 
 async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) -> ServerMessageResponse:
@@ -36,7 +37,8 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
 
     account_sid = settings.TWILIO_ACCOUNT_SID
     auth_token = settings.TWILIO_AUTH_TOKEN
-    twilio_client = Client(account_sid, auth_token)
+    ahttp_client = AsyncTwilioHttpClient()
+    twilio_client = Client(account_sid, auth_token, http_client=ahttp_client)
 
     results = []
 
