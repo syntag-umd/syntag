@@ -159,7 +159,7 @@ def create_appointment_tool(shop_name, phone_number):
         },
         "function": {
             "name": "book_squire_appointment",
-            "description": "This function allows booking an appointment with a specified barber and service at a given time. This function needs to be called to book an appointment. Before booking an appointment, collect the necessary fields from the user. Don't forget to collect their first name and last name. Once you have the necessary information, remind the user that there is a cancellation policy that means you can't cancel the appointment less than an hour before the appointment time. You can also remind the user that they will receive a confirmation email and a text before the appointment.",
+            "description": "This function allows booking an appointment with a specified barber and service at a given time. This function needs to be called to book an appointment. Before booking an appointment, collect the necessary fields from the user. Don't forget to collect their first name and last name. Then, ask if the phone number they are calling from is fine to text. If not, just ask for their number - you can format it by yourself without asking them about a specific format."
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -191,12 +191,12 @@ def create_appointment_tool(shop_name, phone_number):
                         "description": "The last name of the client booking the appointment.",
                         "type": "string",
                     },
-                    "email": {
-                        "description": "The email address of the client for booking confirmation and notifications. Must follow this pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$.  Optional.",
-                        "type": "string",
-                    },
+                    # "email": {
+                    #     "description": "The email address of the client for booking confirmation and notifications. Must follow this pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$.  Optional.",
+                    #     "type": "string",
+                    # },
                     "phoneNumber": {
-                        "description": f"The phone number of the client to contact or send updates regarding the appointment. Please provide the phone number in the E.164 format (i.e., +14155552671). If the user is OK with you texting them, YOU MUST PASS IN THIS NUMBER INSTEAD: {phone_number}.",
+                        "description": f"The phone number of the client to contact or send updates regarding the appointment. Only provide this argument if the user doesn't want you texting them at the number they are calling from. Provide in the format +1XXXXXXXXXX, but don't ask the user about this format."
                         "type": "string",
                     },
                 },
