@@ -102,7 +102,7 @@ async def handle_send_to_address(tool_call_id, function_args, assistant_config, 
     print("Sending to address:", phone_number)
 
     # Send WhatsApp message via Twilio
-    message = twilio_client.messages.create(
+    message = await twilio_client.messages.create_async(
         from_="whatsapp:+14155238886",
         body="Please book your appointment with Today's Hair here: https://getsquire.com/discover/barbershop/370f1443-c506-4c20-b725-ef1d1443a943",
         to="whatsapp:" + phone_number,
