@@ -21,8 +21,6 @@ const AdminDashboard: React.FC = () => {
     regularAccounts: 0,
     squireAccounts: 0,
     totalAssistants: 0,
-    squireAssistants: 0,
-    regularAssistants: 0,
     totalSignInsToday: 0,
     totalSignIns3Days: 0,
     totalSignInsWeek: 0,
@@ -60,15 +58,26 @@ const AdminDashboard: React.FC = () => {
         return;
       }
 
-      // Fetch voice assistants
+      // Fetch voice assistants and calculate squire accounts
       const { data: voiceBots, error: voiceBotsError } = await supabase
         .from('voice_assistant')
-        .select('id')
+        .select('uuid, agent_config'); // Fetch UUIDs and agent_config
 
       if (voiceBotsError) {
         console.error("Error fetching voice assistants:", voiceBotsError);
         return;
       }
+
+      // Calculate unique squire accounts
+      const squireUUIDs = new Set<string>(); // Use a Set to store unique UUIDs
+      voiceBots.forEach(bot => {
+        const config = bot.agent_config; // Access agent_config
+        if (config?.type === "squire") { // Check if type is "squire"
+          squireUUIDs.add(bot.uuid); // Add UUID to the Set
+        }
+      });
+
+      const totalSquireAccounts = squireUUIDs.size; // Get the count of unique squire UUIDs
 
       // Fetch Clerk user data
       const fetchUserData = async () => {
@@ -106,6 +115,7 @@ const AdminDashboard: React.FC = () => {
         totalAssistants: totalAssistants,
         totalAccounts: totalAccounts,
         adminAccounts: adminAccounts,
+        squireAccounts: totalSquireAccounts, // Update squire accounts
       }));
     };
 
