@@ -138,6 +138,11 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
         for barber in barbers
         if barber_names_to_ids.get(barber) is not None
     ]
+    
+    print("Timezone", timezone_str)
+    print("Shop name", shop_name)
+    print("Services", services)
+    print("Barber IDs", barber_ids)
 
     booking_client = BarberBookingClient(shop_name=shop_name)
 
@@ -147,6 +152,8 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
     next_openings = await booking_client.get_next_n_openings(
         timezone_str, services, barber_ids, n_next_openings
     )
+    
+    print("Next openings", next_openings)
 
     if next_openings:
         next_opening_times = [opening["time"] for opening in next_openings]
@@ -194,6 +201,13 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
         for barber in barbers
         if barber_names_to_ids.get(barber) is not None
     ]
+    
+    print("Timezone", timezone_str)
+    print("Shop name", shop_name)
+    print("Services", services)
+    print("Barber IDs", barber_ids)
+    print("Days ahead", days_ahead)
+    
 
     booking_client = BarberBookingClient(shop_name=shop_name)
 
@@ -203,6 +217,8 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
     next_openings = await booking_client.get_next_n_openings(
         timezone_str, services, barber_ids, n_next_openings, days_ahead
     )
+    
+    print("Next openings", next_openings)
 
     if next_openings:
         next_opening_times = [opening["time"] for opening in next_openings]
