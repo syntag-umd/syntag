@@ -25,7 +25,8 @@ const AdminDashboard: React.FC = () => {
     regularAssistants: 0,
     totalSignInsToday: 0,
     totalSignIns3Days: 0,
-    averageDuration: 0,
+    totalSignInsWeek: 0,
+    totalSignInsMonth: 0,
     totalUsers: 0, // New metric for Clerk users
   });
 
@@ -42,18 +43,18 @@ const AdminDashboard: React.FC = () => {
       const { data: users, error: userError } = await supabase
         .from('user') // Specify the table name
         .select('id'); // Fetch only the 'id' or any other field if needed
-  
+
       if (userError) {
         console.error("Error fetching users:", userError);
         return;
       }
-    
+
       // Fetch admin users
       const { data: adminUsers, error: adminError } = await supabase
         .from('user')
         .select('id')
         .eq('is_admin_account', true); // Query to fetch only admin accounts
-  
+
       if (adminError) {
         console.error("Error fetching admin accounts:", adminError);
         return;
@@ -64,39 +65,41 @@ const AdminDashboard: React.FC = () => {
         .from('voice_assistant')
         .select('id')
 
-      if(voiceBotsError) {
+      if (voiceBotsError) {
         console.error("Error fetching voice assistants:", voiceBotsError);
         return;
       }
 
       // Fetch Clerk user data
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('api/getUsers');
-        const data = await response.json();
-        if (response.ok) {
-          setMetrics(prevMetrics => ({
-            ...prevMetrics,
-            totalUsers: data.totalUsers, // Update total Clerk users count
-            totalSignInsToday: data.totalSignedInToday,
-            totalSignIns3Days: data.totalSignIns3Days,
-          }));
-        } else {
-          console.error("Error fetching Clerk user data:", data.error);
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch('api/getUsers');
+          const data = await response.json();
+          if (response.ok) {
+            setMetrics(prevMetrics => ({
+              ...prevMetrics,
+              totalUsers: data.totalUsers, // Update total Clerk users count
+              totalSignInsToday: data.totalSignedInToday,
+              totalSignIns3Days: data.totalSignIns3Days,
+              totalSignInsWeek: data.totalSignInsWeek,
+              totalSignInsMonth: data.totalSignInsMonth,
+            }));
+          } else {
+            console.error("Error fetching Clerk user data:", data.error);
+          }
+        } catch (error) {
+          console.error("Error fetching Clerk user data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching Clerk user data:", error);
-      }
-    };
+      };
 
       // Call Clerk user data fetch
       fetchUserData();
-  
+
       // Calculate metrics
       const totalAssistants = voiceBots.length;
       const totalAccounts = users.length;
       const adminAccounts = adminUsers.length;
-  
+
       // Update your state with the new metrics
       setMetrics(prevMetrics => ({
         ...prevMetrics,
@@ -105,7 +108,7 @@ const AdminDashboard: React.FC = () => {
         adminAccounts: adminAccounts,
       }));
     };
-  
+
     fetchMetrics();
   }, []);
 
@@ -159,19 +162,20 @@ const AdminDashboard: React.FC = () => {
                   <Statistic title="Total Assistants" value={metrics.totalAssistants} />
                 </Col>
                 <Col span={8}>
-                  <Statistic title="Squire Assistants" value={metrics.squireAssistants} />
-                </Col>
-                <Col span={8}>
-                  <Statistic title="Regular Assistants" value={metrics.regularAssistants} />
-                </Col>
-                <Col span={8}>
                   <Statistic title="Total Sign-ins Today" value={metrics.totalSignInsToday} />
                 </Col>
                 <Col span={8}>
-                  <Statistic title="Total Sign-ins Past 3 days" value={metrics.totalSignIns3Days} />
+                  <Statistic title="Total Sign-ins Past 3 Days" value={metrics.totalSignIns3Days} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Total Sign-ins Past Week" value={metrics.totalSignInsWeek} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Total Sign-ins Past Month" value={metrics.totalSignInsMonth} />
                 </Col>
               </Row>
             </TabPane>
+
             <TabPane tab="Customers" key="2">
               <Title level={4}>Customer Management</Title>
               {/* Add your customer management logic here */}
