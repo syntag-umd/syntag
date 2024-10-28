@@ -63,7 +63,7 @@ class BarberBookingClient:
         shop_id = None
         barber_name_to_id = {}
 
-        for item in data[:1]:
+        for item in data:
             barber_info = item.get("barber", {})
 
             first_name = barber_info.get("firstName", "")
