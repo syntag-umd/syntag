@@ -29,6 +29,8 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
         )
         .first()
     )
+    
+    customer_phone_number = toolMessage["call"]["customer"]["number"]
 
     assistant_config = assistant.agent_config
 
@@ -74,7 +76,7 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
             results.append(result)
         elif function_name == "book_squire_appointment":
             result = await handle_book_squire_appointment(
-                tool_call_id, function_args, assistant_config
+                tool_call_id, function_args, assistant_config, customer_phone_number
             )
             results.append(result)
         else:
@@ -310,7 +312,7 @@ async def handle_check_for_walkin_availability(
 
 
 async def handle_book_squire_appointment(
-    tool_call_id, function_args, assistant_config
+    tool_call_id, function_args, assistant_config, customer_phone_number
 ):
     # Get the appointment details
     shop_name = function_args.get("shopName", assistant_config["shop_name"])
@@ -320,8 +322,9 @@ async def handle_book_squire_appointment(
     time = standardize_time(function_args["time"])
     first_name = function_args["firstName"]
     last_name = function_args["lastName"]
-    email = function_args.get("email", "vikram@syntag.ai")
-    phone_number = function_args["phoneNumber"]
+    phone_number = function_args.get("phoneNumber", customer_phone_number)
+    
+    email = "admin@syntag.ai"
 
     appointmentBookingRequest = AppointmentBookingRequest(
         barberOrderIndex=barber_order_index,
