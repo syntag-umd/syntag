@@ -10,7 +10,6 @@ from app.models.enums import DEFAULT_TOKEN_COUNT
 from nlp_syntag.llm.vapi import Message
 from fastapi.responses import StreamingResponse
 import tiktoken
-from openai import OpenAI, AsyncOpenAI
 from app.services.pinecone.utils import pc_index
 from app.core.config import settings
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
@@ -18,13 +17,6 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
 from app.utils import suppress_library_logging
-
-
-OPENAI_API_KEY = settings.OPENAI_API_KEY
-
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
-
-async_openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
 def generate_chat_response(content: str, role="assistant") -> StreamingResponse:

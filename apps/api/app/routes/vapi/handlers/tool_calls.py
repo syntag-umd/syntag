@@ -15,6 +15,7 @@ from app.services.vapi.generated_models import (
 )
 from app.routes.vapi.utils import format_time_readable, standardize_time
 from twilio.rest import Client
+from twilio.http.async_http_client import AsyncTwilioHttpClient
 
 
 async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) -> ServerMessageResponse:
@@ -36,7 +37,8 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
 
     account_sid = settings.TWILIO_ACCOUNT_SID
     auth_token = settings.TWILIO_AUTH_TOKEN
-    twilio_client = Client(account_sid, auth_token)
+    ahttp_client = AsyncTwilioHttpClient()
+    twilio_client = Client(account_sid, auth_token, http_client=ahttp_client)
 
     results = []
 
@@ -100,7 +102,7 @@ async def handle_send_to_address(tool_call_id, function_args, assistant_config, 
     print("Sending to address:", phone_number)
 
     # Send WhatsApp message via Twilio
-    message = twilio_client.messages.create(
+    message = await twilio_client.messages.create_async(
         from_="whatsapp:+14155238886",
         body="Please book your appointment with Today's Hair here: https://getsquire.com/discover/barbershop/370f1443-c506-4c20-b725-ef1d1443a943",
         to="whatsapp:" + phone_number,

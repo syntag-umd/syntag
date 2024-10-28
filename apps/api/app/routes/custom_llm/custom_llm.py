@@ -19,7 +19,7 @@ from app.routes.custom_llm.utils import (
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from fastapi.responses import StreamingResponse
-from openai import AsyncOpenAI
+from app.services.openai.utils import async_openai_client
 from app.services.pinecone.utils import pc_index
 from app.database.session import get_db
 from app.core.config import settings
@@ -27,10 +27,6 @@ import asyncio
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
 import traceback
 from datetime import datetime, timedelta, timezone
-
-OPENAI_API_KEY = settings.OPENAI_API_KEY
-
-async_openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
 router = APIRouter(prefix="/custom-llm")
