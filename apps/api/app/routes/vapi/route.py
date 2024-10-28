@@ -51,7 +51,8 @@ from app.routes.vapi.tools import (
     create_appointment_tool, 
     create_fetch_next_opening_tool, 
     create_fetch_availability_on_day_tool, 
-    create_check_walkin_availability_tool
+    create_check_walkin_availability_tool,
+    create_get_barber_for_appointment_tool
 )
 from app.utils import admin_key_header, constant_time_compare
 from sqlalchemy.orm import joinedload
@@ -517,6 +518,10 @@ async def server_url(
                 )
                 
                 check_walkin_availability_tool = create_check_walkin_availability_tool()
+                
+                get_barber_for_appointment_tool = create_get_barber_for_appointment_tool(
+                    service_types, barber_names
+                )
 
                 async with BarberBookingClient(None, shop_name) as client:
                     prompt_and_assistant_config = await client.get_prompt_and_assistant_config()
@@ -548,7 +553,8 @@ async def server_url(
                         appointment_tool, 
                         fetch_next_opening_tool, 
                         fetch_availability_on_day_tool,
-                        check_walkin_availability_tool
+                        check_walkin_availability_tool, 
+                        get_barber_for_appointment_tool
                     ] 
 
                     return ServerMessageResponse(
@@ -733,10 +739,57 @@ async def server_url(
                     results.append(result)
                 
                 elif function_name == "check_availability_on_day_and_time":
-                    pass
+                    
+                    haircut_services = assistant_config.get("haircut_services", ["haircut", "Haircut", "HAIRCUT"])
+                    shop_name = assistant_config["shop_name"]
+                    
+                    services_list = function_args.get("services", haircut_services)
+                    barber = function_args.get("barber")
+                    day_str = function_args.get("day")
+                    time_str = function_args.get("time")
+                    
+                    if barber:
+                        barber_id = barber_names_to_ids.get(barber)
+                    else:
+                        barber_id = None
+                        
+                    booking_client = BarberBookingClient(shop_name=shop_name)
+                    
+                    availability = await get_barber_for_appointment(self, day_str, time_str, services_list, barber_id)
+                    if availability:
+                        barber_name, service_name = availability
+                        response_coercing_string = f"YOUR RESPONSE MUST BE THE FOLLOWING: {barber_name} is available for a {service_name} at {time_str} on {day_str}."
+                        
+                    else:
+                        response_coercing_string = f"YOUR RESPONSE MUST BE THE FOLLOWING: {barber_name} is NOT available for a {service_name} at {time_str} on {day_str}."
+                        
+                    result = ToolCallResult(
+                        toolCallId=tool_call_id,
+                        name=function_name,
+                        result=response_coercing_string,
+                    )
+                    
+                    results.append(result)
                 
                 elif function_name == "check_for_walkin_availability":
-                    pass
+                    shop_name = assistant_config["shop_name"]
+                    
+                    booking_client = BarberBookingClient(shop_name=shop_name)
+                    
+                    walkins_allowed = await booking_client.are_walkins_allowed()
+                    
+                    if walkins_allowed:
+                        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: We are currently taking walk-ins since our barbers aren't that busy right now. However, we recommend booking an appointment to ensure you get a slot!"
+                    else:
+                        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: We are currently not taking walk-ins right now. Would you like to book an appointment?"
+                    
+                    result = ToolCallResult(
+                        toolCallId=tool_call_id,
+                        name=function_name,
+                        result=response_coercing_string,
+                    )
+                    
+                    results.append(result)
 
                 elif function_name == "book_squire_appointment":
 
