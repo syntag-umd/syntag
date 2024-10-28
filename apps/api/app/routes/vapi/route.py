@@ -12,6 +12,10 @@ from app.utils import get_user_from_req, admin_key_header
 from app.services.vapi.generated_models import ServerMessage, ServerMessageResponse
 from app.models.utils import IgnoreValidation
 
+from app.routes.vapi.handlers.assistant_request import handle_assistant_request
+from app.routes.vapi.handlers.eoc_report import handle_end_of_call_report
+from app.routes.vapi.handlers.tool_calls import handle_tool_calls
+
 router = APIRouter(prefix="/vapi")
 
 @router.post("/get-vapi-config", response_model=GetVapiConfigResponse)

@@ -9,7 +9,10 @@ from app.services.vapi.vapi_models import (
     ServerMessageResponse,
     ServerMessageResponseAssistantRequest,
 )
-from app.services.vapi.generated_models import AssistantOverrides
+from app.services.vapi.generated_models import (
+    AssistantOverrides,
+    ServerMessageAssistantRequest,
+)
 from app.routes.vapi.tools import (
     create_appointment_tool,
     create_fetch_next_opening_tool,

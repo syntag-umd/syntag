@@ -13,14 +13,17 @@ from app.database.tables.voice_assistant import VoiceAssistant
 from app.models.enums import ChatMedium, Language
 from app.services.analytics.summary import summarize_conversation
 from app.services.analytics.review import extract_review
-from app.services.vapi.generated_models import ServerMessageEndOfCallReport
+from app.services.vapi.generated_models import (
+    ServerMessageEndOfCallReport,
+    ServerMessageResponse,
+)
 from app.utils import get_token_count
 from app.core.config import settings
 from datetime import datetime
 from twilio.rest import Client
 from twilio.http.async_http_client import AsyncTwilioHttpClient
 import asyncio
-from app.services.billing import create_account_balance_invoice
+from app.routes.billing.utils import create_account_balance_invoice
 
 def get_assistant_and_user(eocReport, db):
     assistant = (
