@@ -99,6 +99,49 @@ def create_check_walkin_availability_tool():
             },
         },
     }
+    
+def create_get_barber_for_appointment_tool(service_types, barber_names):
+    
+    current_env = settings.ENVIRONMENT
+    
+    return {
+        "async": True,
+        "type": "function",
+        "server": {
+            "url": (
+                "https://api.syntag.ai/vapi/server-url"
+                if current_env == "production"
+                else "https://develop-api.syntag.ai/vapi/server-url"
+            )
+        },
+        "function": {
+            "name": "check_walkin_availability",
+            "description": "Call this function when a customer asks for walk-in availability. Calling this function will tell you exactly what to say to the customer. Again, while this function does retrieve available times, it is meant to tell you exactly what to say in response. However, you are free to translate the response into the language the customer speaks.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "day": {
+                        "description": "The day of the appointment. Must be in the format 'YYYY-MM-DD'.",
+                        "type": "string",
+                    },
+                    "time": {
+                        "description": "The time of the appointment in 'HH:MM' format.",
+                        "type": "string",
+                    },
+                    "services": {
+                        "description": f"A list of all services relating to the user's specified service. As this parameter is optional, you should only provide it if the user actually specifies their service. Otherwise, it will default to haircut-related services, which is the intended behavior. The default services will be those that are haircut-related. The possible values for this are: {service_types}.",
+                        "type": "array",
+                        "items": {"type": "string"},
+                    }, 
+                    "barber": {
+                        "description": f"The name of the barber with whom the appointment is being booked. The possible values for this are: {barber_names}.",
+                        "type": "string",
+                    }
+                },
+                "required": ["day", "time"],
+            },
+        },
+    }
 
 def create_appointment_tool(shop_name, phone_number):
 

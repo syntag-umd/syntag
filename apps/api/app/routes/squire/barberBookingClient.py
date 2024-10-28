@@ -440,3 +440,62 @@ class BarberBookingClient:
 
         # Return True if there are more than 4 unique times, else False
         return num_unique_times > 4
+
+    async def get_barber_for_appointment(self, day_str, time_str, services_list, barber_id=None):
+        """
+        Check if an appointment at the given day and time is available for the given services.
+        If available, return the name of the barber and the service name with which the appointment is available.
+        If barber_id is provided, check availability only for that barber.
+        """
+        shop_timezone = self.shop_timezone or 'UTC'
+
+        # Parse the day and time into datetime object in shop's timezone
+        appointment_datetime = datetime.strptime(f'{day_str} {time_str}', '%Y-%m-%d %H:%M')
+        appointment_datetime = appointment_datetime.replace(tzinfo=ZoneInfo(shop_timezone))
+
+        if barber_id:
+            # Get barber_name
+            barber_name = next((name for name, info in self.barbers.items() if info['id'] == barber_id), None)
+            if not barber_name:
+                return None  # Barber not found
+            barbers_to_check = [(barber_name, barber_id)]
+        else:
+            barbers_to_check = [(name, info['id']) for name, info in self.barbers.items()]
+
+        for barber_name, barber_id in barbers_to_check:
+
+            barber_info = self.barbers[barber_name]
+            min_service_length = barber_info.get('min_service_length') or 15
+
+            # Fetch services offered by the barber
+            barber_services = await self.fetch_services(barber_id, barber_name)
+            services_json = barber_services[1]
+            processed_services = self.process_services(services_json)
+
+            # Filter services to those matching the services_list
+            matching_services = [
+                service for service in processed_services
+                if service['service_name'].strip().lower() in [s.strip().lower() for s in services_list]
+            ]
+            if not matching_services:
+                continue  # This barber does not offer the requested services
+
+            # For each matching service, check availability
+            for service in matching_services:
+                service_id = service['id']
+                service_name = service['service_name']
+                duration = service['duration']
+
+                # Fetch availability for that service duration
+                availability_data = await self.fetch_availability(barber_id, day_str, day_str, duration)
+
+                # Extract available times
+                available_times = self.extract_available_times(availability_data, shop_timezone)
+
+                # Check if appointment_datetime is in available_times
+                if appointment_datetime in available_times:
+                    # Appointment is available with this barber and service
+                    return barber_name, service_name
+
+        # No appointment available at that time
+        return None
