@@ -75,6 +75,30 @@ def create_fetch_availability_on_day_tool(service_types, barber_names):
         },
     }
 
+def create_check_walkin_availability_tool():
+    
+    current_env = settings.ENVIRONMENT
+    
+    return {
+        "async": True,
+        "type": "function",
+        "server": {
+            "url": (
+                "https://api.syntag.ai/vapi/server-url"
+                if current_env == "production"
+                else "https://develop-api.syntag.ai/vapi/server-url"
+            )
+        },
+        "function": {
+            "name": "check_walkin_availability",
+            "description": "Call this function when a customer asks for walk-in availability. Calling this function will tell you exactly what to say to the customer. Again, while this function does retrieve available times, it is meant to tell you exactly what to say in response. However, you are free to translate the response into the language the customer speaks.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    }
 
 def create_appointment_tool(shop_name, phone_number):
 
@@ -92,7 +116,7 @@ def create_appointment_tool(shop_name, phone_number):
         },
         "function": {
             "name": "book_squire_appointment",
-            "description": "This function allows booking an appointment with a specified barber and service at a given time. This function needs to be called to book an appointment. Before booking an appointment, collect the necessary fields from the user. Once you have the necessary information, remind the user that there is a cancellation policy that means you can't cancel the appointment less than an hour before the appointment time. You can also remind the user that they will receive a confirmation email and a text before the appointment.",
+            "description": "This function allows booking an appointment with a specified barber and service at a given time. This function needs to be called to book an appointment. Before booking an appointment, collect the necessary fields from the user. Don't forget to collect their first name and last name. Once you have the necessary information, remind the user that there is a cancellation policy that means you can't cancel the appointment less than an hour before the appointment time. You can also remind the user that they will receive a confirmation email and a text before the appointment.",
             "parameters": {
                 "type": "object",
                 "properties": {
