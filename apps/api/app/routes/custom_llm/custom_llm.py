@@ -38,7 +38,8 @@ async def get_fast_response(
     body: ChatCallRequest,
     db: Session = Depends(get_db),
 ):
-    logging.info("===custom llm===")
+    logging.info(f"===custom llm===\nBody: {body.model_dump_json()}")
+
     start_request = time.time()
 
     try:
