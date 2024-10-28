@@ -98,14 +98,15 @@ async def server_url(
     try:
         # Authentication logic
 
-        message_type = body["message"]["type"]
+        message = body["message"]
+        message_type = message["type"]
 
         if message_type == "end-of-call-report":
-            return await handle_end_of_call_report(body, db)
+            return await handle_end_of_call_report(message, db)
         elif message_type == "assistant-request":
-            return await handle_assistant_request(body, db)
+            return await handle_assistant_request(message, db)
         elif message_type == "tool-calls":
-            return await handle_tool_calls(body, db)
+            return await handle_tool_calls(message, db)
         else:
             return None
 
