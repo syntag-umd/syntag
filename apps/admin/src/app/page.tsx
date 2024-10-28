@@ -24,6 +24,7 @@ const AdminDashboard: React.FC = () => {
     squireAssistants: 0,
     regularAssistants: 0,
     totalSignInsToday: 0,
+    totalSignIns3Days: 0,
     averageDuration: 0,
     totalUsers: 0, // New metric for Clerk users
   });
@@ -77,7 +78,8 @@ const AdminDashboard: React.FC = () => {
           setMetrics(prevMetrics => ({
             ...prevMetrics,
             totalUsers: data.totalUsers, // Update total Clerk users count
-            totalSignInsToday: data.totalSignedInToday
+            totalSignInsToday: data.totalSignedInToday,
+            totalSignIns3Days: data.totalSignIns3Days,
           }));
         } else {
           console.error("Error fetching Clerk user data:", data.error);
@@ -166,7 +168,7 @@ const AdminDashboard: React.FC = () => {
                   <Statistic title="Total Sign-ins Today" value={metrics.totalSignInsToday} />
                 </Col>
                 <Col span={8}>
-                  <Statistic title="Average Duration" value={metrics.averageDuration} />
+                  <Statistic title="Total Sign-ins Past 3 days" value={metrics.totalSignIns3Days} />
                 </Col>
               </Row>
             </TabPane>
