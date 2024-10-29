@@ -107,13 +107,19 @@ async def get_fast_response(
             conversation_content = truncate_conversation(body_messages)
 
             embed_start = time.time()
-            embedded = await azure_text3large_embedding.embeddings.create(
-                input=conversation_content,
-                model="text-embedding-3-large",
-            )
-            embed_time = time.time() - embed_start
-            logging.info(f"Embedding Time: {round(embed_time * 1000)}")
-            return embedded
+            try:
+                embedded = await azure_text3large_embedding.embeddings.create(
+                    input=conversation_content,
+                    model="text-embedding-3-large",
+                )
+                embed_time = time.time() - embed_start
+                logging.info(f"Embedding Time: {round(embed_time * 1000)}")
+                return embedded
+            except Exception as e:
+                logging.error(
+                    f"Error during embedding: {repr(e)}\nTraceback:\n{traceback.format_exc()}"
+                )
+                return None
 
         embed_convo_task = asyncio.create_task(embed_convo())
         get_uuids_task = asyncio.create_task(db_calls())
@@ -125,45 +131,48 @@ async def get_fast_response(
         if not convo_cache:
             convo_cache: ConversationCache = {"previously_injected_chunk_ids": []}
 
-        try:
-            query_top_k = top_k + len(convo_cache["previously_injected_chunk_ids"])
-            vector = embedded.data[0].embedding
-            query_start = time.time()
-            query_result = pc_index.query(
-                vector=vector,
-                namespace=user_uuid,
-                top_k=query_top_k,
-                filter={"knowledge_uuid": {"$in": knowledge_uuids}},
-                include_metadata=True,
-                timeout=1,
-            )
-            query_time = time.time() - query_start
-            logging.info(f"Pinecone Query Time: {round(query_time * 1000)}")
+        chunks = []
+        if embedded is not None:
+            try:
+                query_top_k = top_k + len(convo_cache["previously_injected_chunk_ids"])
+                vector = embedded.data[0].embedding
+                query_start = time.time()
+                query_result = pc_index.query(
+                    vector=vector,
+                    namespace=user_uuid,
+                    top_k=query_top_k,
+                    filter={"knowledge_uuid": {"$in": knowledge_uuids}},
+                    include_metadata=True,
+                    timeout=1,
+                )
+                query_time = time.time() - query_start
+                logging.info(f"Pinecone Query Time: {round(query_time * 1000)}")
 
-            chunks = []
-            count_new_chunks = 0
-            for match in query_result.get("matches", []):
-                if count_new_chunks >= top_k:
-                    break
-                score = match.get("score", 0)
-                metadata = match.get("metadata", {})
-                chunk_id = metadata.get("chunk_id", None)
-                if chunk_id is None:
-                    continue
+                count_new_chunks = 0
+                for match in query_result.get("matches", []):
+                    if count_new_chunks >= top_k:
+                        break
+                    score = match.get("score", 0)
+                    metadata = match.get("metadata", {})
+                    chunk_id = metadata.get("chunk_id", None)
+                    if chunk_id is None:
+                        continue
 
-                if score > 0.25:
-                    chunk_id = int(chunk_id)
-                    if chunk_id not in convo_cache["previously_injected_chunk_ids"]:
-                        count_new_chunks += 1
-                        convo_cache["previously_injected_chunk_ids"].append(chunk_id)
-                    chunks.append(chunk_id)
-                else:
-                    # print("Score too low", score, user_uuid + "#"+ str(chunk_id) )
-                    pass
-        except Exception as e:
-            logging.error(
-                f"Error during Pinecone query: {repr(e)}\nTraceback:\n{traceback.format_exc()}"
-            )
+                    if score > 0.25:
+                        chunk_id = int(chunk_id)
+                        if chunk_id not in convo_cache["previously_injected_chunk_ids"]:
+                            count_new_chunks += 1
+                            convo_cache["previously_injected_chunk_ids"].append(chunk_id)
+                        chunks.append(chunk_id)
+                    else:
+                        # print("Score too low", score, user_uuid + "#"+ str(chunk_id) )
+                        pass
+            except Exception as e:
+                logging.error(
+                    f"Error during Pinecone query: {repr(e)}\nTraceback:\n{traceback.format_exc()}"
+                )
+                chunks = []
+        else:
             chunks = []
 
         if len(chunks) > 0:
@@ -184,7 +193,7 @@ async def get_fast_response(
                 f"Chunk content time: {get_chunks_time} for {len(chunk_results)} chunks",
             )
 
-            system_message = "Search results found the following information that might be relevent: "
+            system_message = "Search results found the following information that might be relevant: "
 
             for knowledge in knowledge_results:
                 if knowledge.content is None:
@@ -302,10 +311,11 @@ async def get_fast_response(
             f"Error during response streaming: {repr(e)}\nTraceback:\n{traceback.format_exc()}"
         )
         logging.info(
-            f"Total time to first chunk: {            round((time.time() - start_request) * 1000)}",
+            f"Total time to first chunk: {round((time.time() - start_request) * 1000)}",
         )
 
         return generate_chat_response("Sorry, I was unable to process that")
+
 
 
 @router.post("/manual/chat/completions")
