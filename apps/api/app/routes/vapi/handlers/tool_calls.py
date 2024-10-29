@@ -345,7 +345,12 @@ async def handle_book_squire_appointment(
     time = standardize_time(function_args["time"])
     first_name = function_args["firstName"]
     last_name = function_args["lastName"]
-    phone_number = function_args.get("phoneNumber", customer_phone_number)
+    can_text_number = function_args["canTextNumber"]
+    
+    if can_text_number:
+        phone_number = customer_phone_number
+    else:
+        phone_number = "+18578691479"
     
     email = "admin@syntag.ai"
 
