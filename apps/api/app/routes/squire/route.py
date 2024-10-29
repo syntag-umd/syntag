@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Response
 from fastapi.responses import JSONResponse
 from app.models.schemas import AppointmentBookingRequest
+import httpx
 
 import logging
 
