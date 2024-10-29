@@ -69,7 +69,7 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
                 tool_call_id, function_args, assistant_config
             )
             results.append(result)
-        elif function_name == "check_for_walkin_availability":
+        elif function_name == "check_walkin_availability":
             result = await handle_check_for_walkin_availability(
                 tool_call_id, function_args, assistant_config
             )
