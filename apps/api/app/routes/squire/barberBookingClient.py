@@ -407,8 +407,8 @@ class BarberBookingClient:
                 # Remove 'datetime' field as it's no longer needed
                 del opening['datetime']
                 unique_openings.append(opening)
-                if len(unique_openings) == n:
-                    break
+                # if len(unique_openings) == n:
+                #     break
 
         return unique_openings
 
