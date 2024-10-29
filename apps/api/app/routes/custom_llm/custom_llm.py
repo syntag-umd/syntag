@@ -278,15 +278,16 @@ async def get_fast_response(
         openai_request_time = time.time() - start_openai_request
         logging.info(f"{name} Request Time: {round(openai_request_time * 1000)}")
 
-        updated_cache = copy.deepcopy(convo_cache)
-        cache_statement = (
-            update(Conversation)
-            .where(Conversation.id == convo.id)
-            .values(cache=updated_cache)
-            .execution_options(synchronize_session="fetch")
-        )
-        db.execute(cache_statement)
-        db.commit()
+        if not skip_embedding:
+            updated_cache = copy.deepcopy(convo_cache)
+            cache_statement = (
+                update(Conversation)
+                .where(Conversation.id == convo.id)
+                .values(cache=updated_cache)
+                .execution_options(synchronize_session="fetch")
+            )
+            db.execute(cache_statement)
+            db.commit()
 
         async def event_stream(completion):
             try:
