@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.utils import suppress_library_logging
 
@@ -129,7 +130,7 @@ def truncate_conversation(messages: List[Message], max_tokens=8000):
 
 
 async def warmup_custom_llm(
-    session: Session,
+    session: AsyncSession,
     timeout=10,
     logging_arg: Literal["info", "error", "none"] = settings.LOGGING_WARMUP_CUSTOM_LLM,
 ) -> tuple[bool, Dict[str, Union[int, None]]]:
@@ -140,11 +141,14 @@ async def warmup_custom_llm(
         logging.info(f"{readable_utc_time}===Warming up Custom LLM===")
 
     async def measure_coroutine_time(
-        name, coroutine, *args
-    ) -> tuple[str, Union[int, None]]:
+        name: str,
+        coroutine_func,
+        *args,
+        **kwargs
+    ) -> Tuple[str, Union[int, None]]:
         start = time.time()
         try:
-            await asyncio.wait_for(coroutine(*args), timeout)
+            await asyncio.wait_for(coroutine_func(*args, **kwargs), timeout)
         except asyncio.TimeoutError:
             return (name, None)
         return (name, round((time.time() - start) * 1000))
@@ -171,15 +175,20 @@ async def warmup_custom_llm(
             pass
 
     coroutines = [
+        # Database operation (Async function)
         measure_coroutine_time(
-            "Db", asyncio.to_thread, session.execute, text("SELECT 1")
+            "Db", session.execute, text("SELECT 1")
         ),
+        # Pinecone (Sync function, wrapped with `asyncio.to_thread`)
         measure_coroutine_time(
             "Pinecone", asyncio.to_thread, pc_index.describe_index_stats
         ),
+        # LLM (Async function)
         measure_coroutine_time("LLM", catch_llm),
+        # Embedding (Async function)
         measure_coroutine_time("Embedding", catch_embedding),
     ]
+
     results = await asyncio.gather(*coroutines)
     success_flag = True
     for name, elapsed_time in results:

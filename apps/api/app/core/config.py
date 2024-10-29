@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     ADMIN_KEY: str = ""
     APIFY_TOKEN: str = ""
     APIFY_SQUIRE_BOOKING_SCRAPER_ACTOR_ID: str = ""
+    ASYNC_DATABASE_URL: str = ""
     AZURE_AI_HUB_KEY: str = ""
     AZURE_AI_HUB_KEY_WESTUS3: str = ""
     AZURE_AI_HUB_KEY_CANADAEAST: str = ""
