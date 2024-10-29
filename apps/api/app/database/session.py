@@ -6,6 +6,8 @@ from app.core.config import settings
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from app.instrumentation import global_tracer
 
+import uuid
+
 # Create a synchronous engine
 engine = create_engine(settings.DATABASE_URL, max_overflow=5, pool_size=3)
 SQLAlchemyInstrumentor().instrument(engine=engine, tracer_provider=global_tracer)
