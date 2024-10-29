@@ -292,19 +292,19 @@ class BarberBookingClient:
 
             prompt += "\n\n"
 
-            durations_availabilities = sorted(
-                barber_availability[barber_name], key=lambda x: x[0]
-            )
-            for (
-                duration,
-                barber_min_service_length,
-                raw_json_availability,
-            ) in durations_availabilities:
-                prompt += f"Duration: {duration} minutes\n\n"
-                prompt += self.create_availability_prompt(
-                    raw_json_availability, duration, barber_min_service_length
-                )
-                prompt += "\n"
+            # durations_availabilities = sorted(
+            #     barber_availability[barber_name], key=lambda x: x[0]
+            # )
+            # for (
+            #     duration,
+            #     barber_min_service_length,
+            #     raw_json_availability,
+            # ) in durations_availabilities:
+            #     prompt += f"Duration: {duration} minutes\n\n"
+            #     prompt += self.create_availability_prompt(
+            #         raw_json_availability, duration, barber_min_service_length
+            #     )
+            #     prompt += "\n"
 
         return {
             "prompt": prompt,
