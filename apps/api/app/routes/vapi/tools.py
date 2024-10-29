@@ -30,6 +30,10 @@ def create_fetch_next_opening_tool(service_types, barber_names):
                         "type": "array",
                         "items": {"type": "string"},
                     },
+                    "days_ahead": {
+                        "description": "The number of days ahead to check availability for. 1 implies checking availability for tomorrow, 2 implies checking availability for the day after tomorrow, and so on.",
+                        "type": "integer",
+                    }
                 },
                 "required": [],
             },
@@ -195,9 +199,9 @@ def create_appointment_tool(shop_name, phone_number):
                     #     "description": "The email address of the client for booking confirmation and notifications. Must follow this pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$.  Optional.",
                     #     "type": "string",
                     # },
-                    "phoneNumber": {
-                        "description": f"The phone number of the client to contact or send updates regarding the appointment. Only provide this argument if the user doesn't want you texting them at the number they are calling from. If the user provides a different number, use E.164 formatting.", 
-                        "type": "string",
+                    "canTextNumber": {
+                        "description": f"Whether or not the user consents to receiving a text confirmation of their appointment.", 
+                        "type": "boolean",
                     },
                 },
                 "required": [
@@ -207,7 +211,7 @@ def create_appointment_tool(shop_name, phone_number):
                     "time",
                     "firstName",
                     "lastName",
-                    "phoneNumber",
+                    "canTextNumber",
                 ],
             },
         },
