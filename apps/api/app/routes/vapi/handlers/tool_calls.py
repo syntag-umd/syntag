@@ -133,6 +133,7 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
 
     services = function_args.get("services", haircut_services)
     barbers = function_args.get("barbers", list(barber_names_to_ids.keys()))
+    days_ahead = function_args.get("days_ahead", 0)
 
     # Ignore barbers that are not in the shop
     barber_ids = [
@@ -152,7 +153,7 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
     async with BarberBookingClient(shop_name=shop_name) as booking_client:
         # Get the next available time
         next_openings = await booking_client.get_next_n_openings(
-            timezone_str, services, barber_ids, n_next_openings
+            timezone_str, services, barber_ids, n_next_openings, days_ahead
         )
         
         print("Next openings", next_openings)
@@ -174,6 +175,9 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
         response_coercing_string = (
             "YOUR RESPONSE MUST BE THE FOLLOWING: Sorry, we don't have any available "
             "slots right now. Should I check for slots tomorrow?"
+        ) if days_ahead == 0 else (
+            "YOUR RESPONSE MUST BE THE FOLLOWING: Sorry, we don't have any available "
+            "slots on that day either. Should I check for slots on another day?"
         )
 
     result = ToolCallResult(
