@@ -54,15 +54,18 @@ async def book_appointment(shop_name: str, request: AppointmentBookingRequest):
             
             response.raise_for_status()
             json_response = response.json()
+            
+            logging.info(f"Response from Squire: {json_response}")
+            
             message = json_response.get('message', '')
             if message == "Book added to shop":
                 # Return a 200 status with a success message
-                return JSONResponse(content={"message": "Booking successful", "success": True}, status_code=200)
+                return {"message": "Booking successful", "success": True}
             else:
                 # Return the error message from the response
                 error_message = json_response.get('error', 'Unknown error')
-                return JSONResponse(content={"error": error_message}, status_code=500)
+                return {"error": error_message}
 
     except Exception as e:
         # Handle any exceptions that occur during the process
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return {"error": str(e)}
