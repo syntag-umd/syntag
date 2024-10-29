@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session, joinedload
 from fastapi.responses import StreamingResponse
 from app.services.openai.utils import async_openai_client
 from app.services.pinecone.utils import pc_index
-from app.database.session import get_db, get_async_db
+from app.database.session import get_db
 from app.core.config import settings
 import asyncio
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
