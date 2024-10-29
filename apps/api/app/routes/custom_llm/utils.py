@@ -15,8 +15,10 @@ from app.core.config import settings
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-
 from app.utils import suppress_library_logging
+from opentelemetry import trace
+
+tracer = trace.get_tracer(__name__)
 
 
 def generate_chat_response(content: str, role="assistant") -> StreamingResponse:
@@ -133,73 +135,73 @@ async def warmup_custom_llm(
     timeout=10,
     logging_arg: Literal["info", "error", "none"] = settings.LOGGING_WARMUP_CUSTOM_LLM,
 ) -> tuple[bool, Dict[str, Union[int, None]]]:
+    with tracer.start_as_current_span("warmup_custom_llm"):
+        if logging_arg == "info":
+            now_utc = datetime.now(timezone.utc)
+            readable_utc_time = now_utc.strftime("%b %d %I:%M:%S %p")
+            logging.info(f"{readable_utc_time}===Warming up Custom LLM===")
 
-    if logging_arg == "info":
-        now_utc = datetime.now(timezone.utc)
-        readable_utc_time = now_utc.strftime("%b %d %I:%M:%S %p")
-        logging.info(f"{readable_utc_time}===Warming up Custom LLM===")
+        async def measure_coroutine_time(
+            name: str,
+            coroutine_func,
+            *args,
+            **kwargs
+        ) -> Tuple[str, Union[int, None]]:
+            start = time.time()
+            try:
+                await asyncio.wait_for(coroutine_func(*args, **kwargs), timeout)
+            except asyncio.TimeoutError:
+                return (name, None)
+            return (name, round((time.time() - start) * 1000))
 
-    async def measure_coroutine_time(
-        name: str,
-        coroutine_func,
-        *args,
-        **kwargs
-    ) -> Tuple[str, Union[int, None]]:
-        start = time.time()
-        try:
-            await asyncio.wait_for(coroutine_func(*args, **kwargs), timeout)
-        except asyncio.TimeoutError:
-            return (name, None)
-        return (name, round((time.time() - start) * 1000))
+        async def catch_llm():
+            try:
+                with suppress_library_logging(["httpx"], level=logging.ERROR):
+                    await azure_gpt4o_mini.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[
+                            {"role": "INVALID ROLE", "content": "Say one word: Apple"}
+                        ],
+                    )
+            except Exception:
+                pass
 
-    async def catch_llm():
-        try:
-            with suppress_library_logging(["httpx"], level=logging.CRITICAL):
-                await azure_gpt4o_mini.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "INVALID ROLE", "content": "Say one word: Apple"}
-                    ],
-                )
-        except Exception:
-            pass
+        async def catch_embedding():
+            try:
+                with suppress_library_logging(["httpx"], level=logging.ERROR):
+                    await azure_text3large_embedding.embeddings.create(
+                        input=[], model="text-embedding-3-large"
+                    )
+            except Exception:
+                pass
 
-    async def catch_embedding():
-        try:
-            with suppress_library_logging(["httpx"], level=logging.CRITICAL):
-                await azure_text3large_embedding.embeddings.create(
-                    input=[], model="text-embedding-3-large"
-                )
-        except Exception:
-            pass
+        coroutines = [
+            # Database operation (sync function)
+            measure_coroutine_time(
+                "Db", asyncio.to_thread, session.execute, text("SELECT 1")
+            ),
+            # Pinecone (Sync function, wrapped with `asyncio.to_thread`)
+            measure_coroutine_time(
+                "Pinecone", asyncio.to_thread, pc_index.describe_index_stats
+            ),
+            # LLM (Async function)
+            measure_coroutine_time("LLM", catch_llm),
+            # Embedding (Async function)
+            measure_coroutine_time("Embedding", catch_embedding),
+        ]
 
-    coroutines = [
-        # Database operation (sync function)
-        measure_coroutine_time(
-            "Db", asyncio.to_thread, session.execute, text("SELECT 1")
-        ),
-        # Pinecone (Sync function, wrapped with `asyncio.to_thread`)
-        measure_coroutine_time(
-            "Pinecone", asyncio.to_thread, pc_index.describe_index_stats
-        ),
-        # LLM (Async function)
-        measure_coroutine_time("LLM", catch_llm),
-        # Embedding (Async function)
-        measure_coroutine_time("Embedding", catch_embedding),
-    ]
+        results = await asyncio.gather(*coroutines)
+        success_flag = True
+        for name, elapsed_time in results:
+            if elapsed_time is None:
+                # success_flag = False
+                if logging_arg == "error" or logging_arg == "info":
+                    logging.info(f"{name} timed out")
+            else:
+                if logging_arg == "info":
+                    logging.info(f"{name} time: {elapsed_time}ms")
 
-    results = await asyncio.gather(*coroutines)
-    success_flag = True
-    for name, elapsed_time in results:
-        if elapsed_time is None:
-            # success_flag = False
-            if logging_arg == "error" or logging_arg == "info":
-                logging.info(f"{name} timed out")
-        else:
-            if logging_arg == "info":
-                logging.info(f"{name} time: {elapsed_time}ms")
-
-    return (success_flag, {f"{name}": elapsed_time for (name, elapsed_time) in results})
+        return (success_flag, {f"{name}": elapsed_time for (name, elapsed_time) in results})
 
 
 def merge_intervals(intervals: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
