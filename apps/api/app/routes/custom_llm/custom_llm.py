@@ -53,23 +53,29 @@ async def get_fast_response(
         top_k: int = 10
 
         vapi_assistant_id = body.call.assistantId
-
-        async def db_calls():
-            start_db_query = time.time()
-
-            voice_assistant_query = (
-                db.query(VoiceAssistant)
-                .filter(VoiceAssistant.vapi_assistant_id == vapi_assistant_id)
-                .options(
-                    joinedload(VoiceAssistant.knowledge),
-                    joinedload(VoiceAssistant.user),
-                )
+        
+        
+        voice_assistant_query = (
+            db.query(VoiceAssistant)
+            .filter(VoiceAssistant.vapi_assistant_id == vapi_assistant_id)
+            .options(
+                joinedload(VoiceAssistant.knowledge),
+                joinedload(VoiceAssistant.user),
             )
-            voice_assistant = voice_assistant_query.first()
-            if not voice_assistant:
-                raise HTTPException(
-                    status_code=404, detail=f"Assistant not found {vapi_assistant_id}"
-                )
+        )
+        voice_assistant = voice_assistant_query.first()
+        if not voice_assistant:
+            raise HTTPException(
+                status_code=404, detail=f"Assistant not found {vapi_assistant_id}"
+            )
+            
+        assistant_config = voice_assistant.agent_config
+        skip_embedding = False
+        if assistant_config.get("type") == "squire": 
+            skip_embedding = True
+            
+        async def db_calls(voice_assistant):
+            start_db_query = time.time()
 
             convo_query = db.query(Conversation).filter(
                 Conversation.vapiCallId == body.call.id
@@ -120,16 +126,22 @@ async def get_fast_response(
                     f"Error during embedding: {repr(e)}\nTraceback:\n{traceback.format_exc()}"
                 )
                 return None
+            
+        if skip_embedding:
+            
+            embedded = None
+            
+        else:
 
-        embed_convo_task = asyncio.create_task(embed_convo())
-        get_uuids_task = asyncio.create_task(db_calls())
+            embed_convo_task = asyncio.create_task(embed_convo())
+            get_uuids_task = asyncio.create_task(db_calls(voice_assistant))
 
-        await asyncio.gather(embed_convo_task, get_uuids_task)
-        embedded = embed_convo_task.result()
-        (user_uuid, knowledge_uuids, convo) = get_uuids_task.result()
-        convo_cache = convo.cache
-        if not convo_cache:
-            convo_cache: ConversationCache = {"previously_injected_chunk_ids": []}
+            await asyncio.gather(embed_convo_task, get_uuids_task)
+            embedded = embed_convo_task.result()
+            (user_uuid, knowledge_uuids, convo) = get_uuids_task.result()
+            convo_cache = convo.cache
+            if not convo_cache:
+                convo_cache: ConversationCache = {"previously_injected_chunk_ids": []}
 
         chunks = []
         if embedded is not None:
@@ -171,8 +183,6 @@ async def get_fast_response(
                     f"Error during Pinecone query: {repr(e)}\nTraceback:\n{traceback.format_exc()}"
                 )
                 chunks = []
-        else:
-            chunks = []
 
         if len(chunks) > 0:
             chunks = chunks[:top_k]
