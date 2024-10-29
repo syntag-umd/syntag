@@ -331,7 +331,7 @@ async def get_manual_response(body: ChatCallRequest):
 
 @router.get("/ping")
 async def ping_custom_llm(
-    db: AsyncSession = Depends(get_async_db),
+    db: Session = Depends(get_db),
     logging_arg: Literal["info", "error", "none"] = settings.LOGGING_WARMUP_CUSTOM_LLM,
 ):
     success, data = await warmup_custom_llm(db, logging_arg=logging_arg)

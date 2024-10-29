@@ -15,7 +15,6 @@ from app.core.config import settings
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.utils import suppress_library_logging
 
@@ -130,7 +129,7 @@ def truncate_conversation(messages: List[Message], max_tokens=8000):
 
 
 async def warmup_custom_llm(
-    session: AsyncSession,
+    session: Session,
     timeout=10,
     logging_arg: Literal["info", "error", "none"] = settings.LOGGING_WARMUP_CUSTOM_LLM,
 ) -> tuple[bool, Dict[str, Union[int, None]]]:
@@ -175,7 +174,7 @@ async def warmup_custom_llm(
             pass
 
     coroutines = [
-        # Database operation (Async function)
+        # Database operation (sync function)
         measure_coroutine_time(
             "Db", session.execute, text("SELECT 1")
         ),
