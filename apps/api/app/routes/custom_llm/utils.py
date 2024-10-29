@@ -176,7 +176,7 @@ async def warmup_custom_llm(
     coroutines = [
         # Database operation (sync function)
         measure_coroutine_time(
-            "Db", session.execute, text("SELECT 1")
+            "Db", asyncio.to_thread, session.execute, text("SELECT 1")
         ),
         # Pinecone (Sync function, wrapped with `asyncio.to_thread`)
         measure_coroutine_time(
