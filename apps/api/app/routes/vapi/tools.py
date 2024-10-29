@@ -16,7 +16,7 @@ def create_fetch_next_opening_tool(service_types, barber_names):
         },
         "function": {
             "name": "fetch_next_opening",
-            "description": "Call this function when a customer asks for the next opening, availability, slot or something similar. Calling this function will tell you exactly what to say to the customer. Again, while this function does retrieve available times, it is meant to tell you exactly what to say in response. However, you are free to translate the response into the language the customer speaks.",
+            "description": "Call this function when a customer asks for the next opening, availability, slot or something similar. It is encouraged to call this function with no parameters, but you can pass in parameters if the customer voluntarily provides them (i.e. don't prompt them for parameters). Calling this function will tell you exactly what to say to the customer. Again, while this function does retrieve available times, it is meant to tell you exactly what to say in response. However, you are free to translate the response into the language the customer speaks.",
             "parameters": {
                 "type": "object",
                 "properties": {

@@ -170,7 +170,8 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
 
         # response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: " + message
         
-        response_coercing_string = str(next_openings)
+        response_coercing_string = ", ".join([f"{opening['time']} on {opening['day']} with {opening['barber']}" for opening in next_openings])
+        
     else:
         response_coercing_string = (
             "YOUR RESPONSE MUST BE THE FOLLOWING: Sorry, we don't have any available "
@@ -227,18 +228,21 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
     print("Next openings", next_openings)
 
     if next_openings:
-        next_opening_times = [opening["time"] for opening in next_openings]
+        # next_opening_times = [opening["time"] for opening in next_openings]
 
-        # Format the available slots
-        if len(next_openings) > 1:
-            next_openings_str = ", ".join(next_opening_times[:-1])
-            next_openings_str += f", and {next_opening_times[-1]}"
-        else:
-            next_openings_str = next_opening_times[0]
+        # # Format the available slots
+        # if len(next_openings) > 1:
+        #     next_openings_str = ", ".join(next_opening_times[:-1])
+        #     next_openings_str += f", and {next_opening_times[-1]}"
+        # else:
+        #     next_openings_str = next_opening_times[0]
 
-        message = f"Our next available slots are {next_openings_str}"
+        # message = f"Our next available slots are {next_openings_str}"
 
-        response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: " + message
+        # response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: " + message
+        
+        response_coercing_string = ", ".join([f"{opening['time']} on {opening['day']} with {opening['barber']}" for opening in next_openings])
+        
     else:
         response_coercing_string = (
             "YOUR RESPONSE MUST BE THE FOLLOWING: Sorry, we don't have any available "
