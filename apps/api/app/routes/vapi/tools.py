@@ -5,7 +5,7 @@ def create_fetch_next_opening_tool(service_types, barber_names):
     current_env = settings.ENVIRONMENT
 
     return {
-        "async": True,
+        "async": False,
         "type": "function",
         "server": {
             "url": (
@@ -40,7 +40,7 @@ def create_fetch_availability_on_day_tool(service_types, barber_names):
     current_env = settings.ENVIRONMENT
 
     return {
-        "async": True,
+        "async": False,
         "type": "function",
         "server": {
             "url": (
@@ -80,7 +80,7 @@ def create_check_walkin_availability_tool():
     current_env = settings.ENVIRONMENT
     
     return {
-        "async": True,
+        "async": False,
         "type": "function",
         "server": {
             "url": (
@@ -105,7 +105,7 @@ def create_get_barber_for_appointment_tool(service_types, barber_names):
     current_env = settings.ENVIRONMENT
     
     return {
-        "async": True,
+        "async": False,
         "type": "function",
         "server": {
             "url": (
