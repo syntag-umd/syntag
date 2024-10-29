@@ -373,8 +373,6 @@ async def handle_book_squire_appointment(
 
     booking_result = await book_appointment(shop_name, appointmentBookingRequest)
 
-    booking_data = booking_result.json()  # Access the JSON content
-
     if booking_data.get("success"):  # Use .get to safely access 'success'
         response_message = (
             "YOUR RESPONSE MUST BE THE FOLLOWING: Your appointment has been "
@@ -383,7 +381,7 @@ async def handle_book_squire_appointment(
     else:
         response_message = (
             "YOUR RESPONSE MUST BE THE FOLLOWING: There was an error booking your "
-            "appointment. Please try again."
+            "appointment. Please try again.\n" + booking_data.get("error", "")
         )
 
     result = ToolCallResult(
