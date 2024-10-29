@@ -154,7 +154,7 @@ async def warmup_custom_llm(
 
     async def catch_llm():
         try:
-            with suppress_library_logging(["httpx"], level=logging.ERROR):
+            with suppress_library_logging(["httpx"], level=logging.CRITICAL):
                 await azure_gpt4o_mini.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
@@ -166,7 +166,7 @@ async def warmup_custom_llm(
 
     async def catch_embedding():
         try:
-            with suppress_library_logging(["httpx"], level=logging.ERROR):
+            with suppress_library_logging(["httpx"], level=logging.CRITICAL):
                 await azure_text3large_embedding.embeddings.create(
                     input=[], model="text-embedding-3-large"
                 )
