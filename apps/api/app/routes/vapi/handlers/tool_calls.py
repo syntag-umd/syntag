@@ -170,7 +170,7 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
 
         # response_coercing_string = "YOUR RESPONSE MUST BE THE FOLLOWING: " + message
         
-        response_coercing_string = ", ".join([f"{opening['time']} on {opening['day']} with {opening['barber']}" for opening in next_openings])
+        response_coercing_string = ", ".join([f"{opening['time']} on {opening['weekday']} with {opening['barber_name']}" for opening in next_openings])
         
     else:
         response_coercing_string = (
