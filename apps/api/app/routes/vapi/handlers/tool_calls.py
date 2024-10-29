@@ -47,9 +47,9 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
         function_name = toolCall["function"]["name"]
         function_args = toolCall["function"]["arguments"]
 
-        print(toolCall)
-        print(function_name)
-        print(function_args)
+        logging.info(toolCall)
+        logging.info(function_name)
+        logging.info(function_args)
 
         if function_name == "send_to_address":
             result = await handle_send_to_address(
@@ -90,7 +90,7 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
             )
             results.append(result)
 
-    print(results)
+    logging.info(results)
 
     return ServerMessageResponse(
         messageResponse=ServerMessageResponseToolCalls(results=results)
@@ -99,7 +99,7 @@ async def handle_tool_calls(toolMessage: ServerMessageToolCalls, db: Session) ->
 
 async def handle_send_to_address(tool_call_id, function_args, assistant_config, twilio_client):
     phone_number = function_args["phone_number"]
-    print("Sending to address:", phone_number)
+    logging.info(f"Sending to address: {phone_number}")
 
     # Send WhatsApp message via Twilio
     message = await twilio_client.messages.create_async(
@@ -142,10 +142,10 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
         if barber_names_to_ids.get(barber) is not None
     ]
     
-    print("Timezone", timezone_str)
-    print("Shop name", shop_name)
-    print("Services", services)
-    print("Barber IDs", barber_ids)
+    logging.info(f"Timezone {timezone_str}")
+    logging.info(f"Shop name {shop_name}")
+    logging.info(f"Services {services}")
+    logging.info(f"Barber IDs {barber_ids}")
 
     n_next_openings = 3
 
@@ -156,7 +156,7 @@ async def handle_fetch_next_opening(tool_call_id, function_args, assistant_confi
             timezone_str, services, barber_ids, n_next_openings, days_ahead
         )
         
-        print("Next openings", next_openings)
+        logging.info(f"Next openings {next_openings}")
 
     if next_openings:
         # next_opening_times = [opening["time"] for opening in next_openings]
@@ -212,11 +212,11 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
         if barber_names_to_ids.get(barber) is not None
     ]
 
-    print("Timezone", timezone_str)
-    print("Shop name", shop_name)
-    print("Services", services)
-    print("Barber IDs", barber_ids)
-    print("Days ahead", days_ahead)
+    logging.info(f"Timezone {timezone_str}")
+    logging.info(f"Shop name {shop_name}")
+    logging.info(f"Services {services}")
+    logging.info(f"Barber IDs {barber_ids}")
+    logging.info(f"Days ahead {days_ahead}")
 
     n_next_openings = 3
 
@@ -227,7 +227,7 @@ async def handle_fetch_availability_on_day(tool_call_id, function_args, assistan
             timezone_str, services, barber_ids, n_next_openings, days_ahead
         )
 
-    print("Next openings", next_openings)
+    logging.info(f"Next openings {next_openings}")
 
     if next_openings:
         # next_opening_times = [opening["time"] for opening in next_openings]

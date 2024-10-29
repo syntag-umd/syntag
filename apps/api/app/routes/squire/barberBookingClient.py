@@ -8,7 +8,7 @@ import pytz
 from itertools import groupby
 
 from app.routes.squire.defaultPrompt import build_default_prompt
-
+import logging
 
 class BarberBookingClient:
     def __init__(self, booking_link: Optional[str] = None, shop_name: Optional[str] = None):
@@ -348,9 +348,9 @@ class BarberBookingClient:
                     barber_name = name
                     break
                 
-            print(self.barbers)
-            print(barber_id)
-            print(barber_name)
+            logging.info(self.barbers)
+            logging.info(barber_id)
+            logging.info(barber_name)
             if not barber_name:
                 continue  # Barber not found
 
@@ -359,12 +359,12 @@ class BarberBookingClient:
             services_json = barber_services[1]
             processed_services = self.process_services(services_json)
             
-            print(processed_services)
+            logging.info(processed_services)
 
             # Filter services
             matching_services = [s for s in processed_services if s['service_name'].strip() in [s.strip() for s in services_list]]
             
-            print(matching_services)
+            logging.info(matching_services)
 
             if not matching_services:
                 continue  # Barber does not offer the desired services

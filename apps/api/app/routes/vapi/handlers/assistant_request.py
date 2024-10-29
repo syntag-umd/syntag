@@ -145,7 +145,7 @@ async def handle_squire_assistant(
     barber_name_to_ids = assistant_config["barber_names_to_ids"]
     barber_names = list(barber_name_to_ids.keys())
 
-    print(assistant_request)
+    logging.info(assistant_request)
 
     callee_phone_number = assistant_request["customer"]["number"]
 

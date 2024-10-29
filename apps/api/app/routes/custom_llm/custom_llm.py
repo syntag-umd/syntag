@@ -165,7 +165,6 @@ async def get_fast_response(
                             convo_cache["previously_injected_chunk_ids"].append(chunk_id)
                         chunks.append(chunk_id)
                     else:
-                        # print("Score too low", score, user_uuid + "#"+ str(chunk_id) )
                         pass
             except Exception as e:
                 logging.error(
