@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.core.config import settings
@@ -11,6 +12,10 @@ SQLAlchemyInstrumentor().instrument(engine=engine, tracer_provider=global_tracer
 
 isolation_engine = engine.execution_options(isolation_level="SERIALIZABLE")
 
+# Also create an async engine
+async_engine = create_async_engine(settings.ASYNC_DATABASE_URL, echo=True)
+SQLAlchemyInstrumentor().instrument(engine=async_engine, tracer_provider=global_tracer)
+
 # Configure the sessionmaker to use the engine
 db_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -19,6 +24,15 @@ isolation_session = sessionmaker(
 )
 
 Base = declarative_base()
+
+# Configure the AsyncSession to use the async engine
+async_db_session = sessionmaker(
+    bind=async_engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+    autocommit=False,
+    autoflush=False,
+)
 
 # Define a function to get a database session
 
@@ -38,6 +52,10 @@ def get_isolated_db():
         yield session
     finally:
         session.close()
+        
+async def get_async_db():
+    async with async_db_session() as session:
+        yield session
 
 
 # Import your table definitions; ensure they are compatible with the

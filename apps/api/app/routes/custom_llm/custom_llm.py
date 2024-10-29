@@ -4,6 +4,7 @@ import time
 import copy
 from typing import List, Literal
 from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.tables.conversation import Conversation, ConversationCache
 from app.database.tables.knowledge import Knowledge
 from app.models.enums import ChatMedium, KnowledgeType, Language
@@ -21,7 +22,7 @@ from sqlalchemy.orm import Session, joinedload
 from fastapi.responses import StreamingResponse
 from app.services.openai.utils import async_openai_client
 from app.services.pinecone.utils import pc_index
-from app.database.session import get_db
+from app.database.session import get_db, get_async_db
 from app.core.config import settings
 import asyncio
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
@@ -320,11 +321,11 @@ async def get_manual_response(body: ChatCallRequest):
 
 @router.get("/ping")
 async def ping_custom_llm(
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     logging_arg: Literal["info", "error", "none"] = settings.LOGGING_WARMUP_CUSTOM_LLM,
 ):
     success, data = await warmup_custom_llm(db, logging_arg=logging_arg)
-    if not success and (logging == "error" or logging == "info"):
+    if not success and (logging_arg == "error" or logging_arg == "info"):
         raise HTTPException(
             status_code=500, detail="Warmup custom llm failed: " + json.dumps(data)
         )
