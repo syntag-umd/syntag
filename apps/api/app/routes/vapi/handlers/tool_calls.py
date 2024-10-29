@@ -373,8 +373,9 @@ async def handle_book_squire_appointment(
 
     booking_result = await book_appointment(shop_name, appointmentBookingRequest)
 
-    # Assuming booking_result is an object with a 'success' attribute
-    if booking_result.success:
+    booking_data = booking_result.json()  # Access the JSON content
+
+    if booking_data.get("success"):  # Use .get to safely access 'success'
         response_message = (
             "YOUR RESPONSE MUST BE THE FOLLOWING: Your appointment has been "
             "successfully booked."

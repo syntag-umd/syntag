@@ -91,7 +91,8 @@ def build_default_prompt(shop_name, barber_list_string, service_list_string, tim
 
     default_prompt += """
     When you are booking an appointment and it comes time to ask for the user's phone number,
-    ask if the number they are calling from is OK to send a confirmation text to fiirst.
+    ask if the number they are calling from is OK to send a confirmation text to first. Additionally,
+    never book an appointment without collecting the user's first and last name.
     """
 
     return default_prompt
