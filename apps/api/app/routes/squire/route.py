@@ -49,11 +49,12 @@ async def book_appointment(shop_name: str, request: AppointmentBookingRequest):
     logging.info(f"Booking appointment with input: {run_input}")
 
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             url = f"https://browser.syntag.ai/squire/shop/{shop_name}/book"
             response = await client.post(url, json=run_input)
             
             response.raise_for_status()
+            
             json_response = response.json()
             
             logging.info(f"Response from Squire: {json_response}")
@@ -69,4 +70,5 @@ async def book_appointment(shop_name: str, request: AppointmentBookingRequest):
 
     except Exception as e:
         # Handle any exceptions that occur during the process
-        return {"error": str(e)}
+        logging.error(f"Error during booking: {e}")
+        return e.message
