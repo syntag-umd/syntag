@@ -128,8 +128,7 @@ async def get_fast_response(
             embed_convo_task = asyncio.create_task(embed_convo())
             get_convo_db_task = asyncio.create_task(get_convo_db(voice_assistant))
             
-            # await asyncio.wait_for(asyncio.gather(embed_convo_task, get_convo_db_task), timeout=2)
-            asyncio.gather(embed_convo_task, get_convo_db_task)
+            await asyncio.wait_for(asyncio.gather(embed_convo_task, get_convo_db_task), timeout=2)
             embedded = embed_convo_task.result()
             convo = get_convo_db_task.result()
 

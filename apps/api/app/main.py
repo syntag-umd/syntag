@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 
 # api key auth
 from fastapi.security.api_key import APIKeyHeader, APIKeyQuery
-from app.database.session import async_db_session, db_session
+from app.database.session import db_session
 from app.routes.custom_llm.utils import warmup_custom_llm
 from app.routes.whoami import router as whoami
 from app.routes.vapi.route import router as vapi_router
@@ -96,7 +96,7 @@ def create_app() -> FastAPI:
     async def startup_event():
         logging.info("===Startup event===")
         try:
-            db = async_db_session()
+            db = db_session()
             success, data = await warmup_custom_llm(db)
             if not success:
                 logging.warn("Startup failed: " + json.dumps(data))
