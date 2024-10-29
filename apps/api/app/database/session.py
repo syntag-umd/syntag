@@ -26,8 +26,6 @@ async_engine = create_async_engine(
         }
     )
 
-SQLAlchemyInstrumentor().instrument(engine=async_engine, tracer_provider=global_tracer)
-
 # Configure the sessionmaker to use the engine
 db_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
