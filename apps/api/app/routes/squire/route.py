@@ -2,6 +2,8 @@ from fastapi import APIRouter, Response
 from fastapi.responses import JSONResponse
 from app.models.schemas import AppointmentBookingRequest
 
+import logging
+
 from app.routes.squire.barberBookingClient import BarberBookingClient
 
 from app.core.config import settings
@@ -42,17 +44,20 @@ async def book_appointment(shop_name: str, request: AppointmentBookingRequest):
         "email": request.email,
         "phoneNumber": request.phoneNumber,
     }
+    
+    logging.info(f"Booking appointment with input: {run_input}")
 
     try:
         async with httpx.AsyncClient() as client:
             url = f"https://browser.syntag.ai/squire/shop/{shop_name}/book"
             response = await client.post(url, json=run_input)
+            
             response.raise_for_status()
             json_response = response.json()
             message = json_response.get('message', '')
             if message == "Book added to shop":
                 # Return a 200 status with a success message
-                return JSONResponse(content={"message": "Booking successful"}, status_code=200)
+                return JSONResponse(content={"message": "Booking successful", "success": True}, status_code=200)
             else:
                 # Return the error message from the response
                 error_message = json_response.get('error', 'Unknown error')
