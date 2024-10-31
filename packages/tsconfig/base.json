@@ -10,6 +10,7 @@
         "strict": true,
         "noUncheckedIndexedAccess": true,
         "checkJs": true,
-        "module": "NodeNext"
+        "module": "NodeNext",
+        "outDir": "./dist"
     }
 }

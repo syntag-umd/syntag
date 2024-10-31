@@ -13,7 +13,9 @@
     }
   },
   "devDependencies": {
-    "@syntag/tsconfig": "workspace:*"
+    "@syntag/eslint-config": "workspace:*",
+    "@syntag/tsconfig": "workspace:*",
+    "eslint": "^9.13.0"
   },
   "keywords": [],
   "author": "",

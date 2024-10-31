@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": [
@@ -63,6 +64,5 @@
   },
   "globalDependencies": [
     ".env"
-  ],
-  "ui": "tui"
+  ]
 }
