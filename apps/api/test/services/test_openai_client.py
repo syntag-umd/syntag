@@ -11,7 +11,7 @@ import pytest
 
 from app.models.enums import Role
 from app.models.schemas import Message
-from app.services.openai_client import OpenAIClient
+from app.services.llm_client import OpenAIClient
 
 
 @pytest.fixture

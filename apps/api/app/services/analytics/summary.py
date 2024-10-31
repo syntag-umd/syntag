@@ -3,7 +3,8 @@ from typing import List
 from app.database.tables.message import Message
 from app.models.enums import Role
 from app.utils import get_token_count
-from app.services.openai.utils import async_openai_client
+from app.services.llm import async_openai_client
+
 
 async def summarize_conversation(db_messages: List[Message]):
     """Summarizes based on the beginning and end of the conversation"""

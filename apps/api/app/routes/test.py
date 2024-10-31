@@ -14,7 +14,7 @@ from app.database.tables.voice_assistant import VoiceAssistant
 import time
 from app.services.pinecone.utils import pc_index
 from app.core.config import settings
-from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
+from app.services.llm import azure_text3large_embedding, azure_gpt4o_mini
 
 import socket
 import ssl
