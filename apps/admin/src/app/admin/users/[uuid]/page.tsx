@@ -24,30 +24,50 @@ type User = {
   is_admin_account: boolean; // Assuming it's a boolean
 };
 
+type VoiceAssistant = {
+  name: string;
+  createdAt: string;
+  conversation_duration_sum: number; // Assuming it's a number
+};
+
 const UserProfile: React.FC = () => {
   const { uuid } = useParams(); // Use useParams to get the UUID from the URL
   const [user, setUser] = useState<User | null>(null);
+  const [voiceAssistants, setVoiceAssistants] = useState<VoiceAssistant[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndVoiceAssistants = async () => {
       if (!uuid) return; // Ensure uuid is available before making the request
 
-      const { data, error } = await supabase
+      // Fetch user information
+      const { data: userData, error: userError } = await supabase
         .from('user')
         .select('*')
         .eq('uuid', uuid)
         .single(); // Fetch a single user by UUID
 
-      if (error) {
-        console.error("Error fetching user:", error);
+      if (userError) {
+        console.error("Error fetching user:", userError);
         return;
       }
-      setUser(data);
+      setUser(userData);
+
+      // Fetch voice assistants associated with the user
+      const { data: voiceAssistantData, error: voiceAssistantError } = await supabase
+        .from('voice_assistant')
+        .select('name, createdAt, conversation_duration_sum')
+        .eq('userUuid', uuid); // Fetch voice assistants where userUuid matches the page's uuid
+
+      if (voiceAssistantError) {
+        console.error("Error fetching voice assistants:", voiceAssistantError);
+        return;
+      }
+      setVoiceAssistants(voiceAssistantData || []);
       setLoading(false); // Update loading state
     };
 
-    fetchUser();
+    fetchUserAndVoiceAssistants();
   }, [uuid]);
 
   return (
@@ -63,7 +83,7 @@ const UserProfile: React.FC = () => {
         ) : user ? (
           <div className="user-profile">
             <Title level={4}>{user.name}</Title>
-            <div className="user-info">
+            <div className="user-info" style={{ marginBottom: '24px' }}> {/* Added marginBottom for spacing */}
               <div className="info-item">
                 <span className="info-label">UUID:</span>
                 <span className="info-value">{user.uuid}</span>
@@ -84,6 +104,25 @@ const UserProfile: React.FC = () => {
                 <span className="info-label">Admin Account:</span>
                 <span className="info-value">{user.is_admin_account ? 'Yes' : 'No'}</span>
               </div>
+            </div>
+
+            {/* Voice Assistants Section with Border */}
+           <div className="voice-assistants" style={{ border: '1px solid #e0e0e0', padding: '16px', borderRadius: '8px', backgroundColor: '#fff' }}>
+              <Title level={4}>Voice Assistants</Title>
+              <p>Total Voice Assistants: {voiceAssistants.length}</p>
+              {voiceAssistants.length > 0 ? (
+                <ul>
+                  {voiceAssistants.map((assistant, index) => (
+                    <li key={index}>
+                      <strong>Name:</strong> {assistant.name}<br />
+                      <strong>Created At:</strong> {new Date(assistant.createdAt).toLocaleString()}<br />
+                      <strong>Conversation Duration Sum:</strong> {assistant.conversation_duration_sum} minutes
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No voice assistants found for this user.</p>
+              )}
             </div>
           </div>
         ) : (
