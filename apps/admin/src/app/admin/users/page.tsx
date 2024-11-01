@@ -1,10 +1,9 @@
-"use client"; // Ensure this is the first line in your file
-
-import '../../globals.css';
+"use client"; // Add this directive at the top of the file
+import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import { SignOutButton } from '@clerk/nextjs';
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Button } from 'antd';
-import Link from 'next/link'; // Import Link from Next.js
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -15,53 +14,34 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 type User = {
-  uuid: string;
   name: string;
+  uuid: string;
+  email: string;
+  createdAt: string;
+  account_balance: number;
+  is_admin_account: boolean;
 };
 
-type Conversation = {
-  userUuid: string;
-};
-
-const ConversationsPage: React.FC = () => {
+const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 10; // Number of users to display per page
+  const usersPerPage = 10; // Adjust as needed
 
   useEffect(() => {
-    const fetchConversations = async () => {
-      // Step 1: Fetch all conversations
-      const { data: conversations, error: convError } = await supabase
-        .from('conversation')
-        .select('userUuid');
-
-      if (convError) {
-        console.error("Error fetching conversations:", convError);
-        setLoading(false);
-        return;
-      }
-
-      // Step 2: Get unique user UUIDs from the conversations
-      const uniqueUserUuids = Array.from(new Set(conversations?.map(conv => conv.userUuid)));
-
-      // Step 3: Fetch user names based on the unique UUIDs
-      const { data: usersData, error: userError } = await supabase
+    const fetchUsers = async () => {
+      const { data, error } = await supabase
         .from('user')
-        .select('uuid, name')
-        .in('uuid', uniqueUserUuids);
+        .select('*');
 
-      if (userError) {
-        console.error("Error fetching users:", userError);
-        setLoading(false);
+      if (error) {
+        console.error("Error fetching users:", error);
         return;
       }
 
-      setUsers(usersData || []);
-      setLoading(false);
+      setUsers(data || []);
     };
 
-    fetchConversations();
+    fetchUsers();
   }, []);
 
   // Pagination calculations
@@ -85,31 +65,23 @@ const ConversationsPage: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ background: '#fff', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Title level={3} style={{ margin: 0 }}>Conversations</Title>
+        <Title level={3} style={{ margin: 0 }}>Users Management</Title>
+        <SignOutButton redirectUrl="/sign-in" />
       </Header>
 
       <Content style={{ margin: '24px 16px 0' }}>
-        {loading ? (
-          <p>Loading conversations...</p>
-        ) : (
-          <div>
-            {currentUsers.length > 0 ? (
-              currentUsers.map(user => (
-                <Link key={user.uuid} href={`/admin/conversations/${user.uuid}`} passHref>
-                  <Button
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+          {currentUsers.map((user) => (
+            <Link key={user.uuid} href={`/admin/users/${user.uuid}`} passHref>
+               <Button
                     style={{ margin: '5px' }}
                   >
                     {user.name || 'Unknown User'}
                   </Button>
-                </Link>
-              ))
-            ) : (
-              <p>No users found</p>
-            )}
-          </div>
-        )}
+            </Link>
+          ))}
+        </div>
 
-        {/* Pagination Controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
           <Button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</Button>
           <span>Page {currentPage} of {totalPages}</span>
@@ -120,4 +92,4 @@ const ConversationsPage: React.FC = () => {
   );
 };
 
-export default ConversationsPage;
+export default AdminDashboard;
