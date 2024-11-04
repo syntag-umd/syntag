@@ -17,6 +17,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 type User = {
   uuid: string;
   name: string;
+  email: string; // Add email to the User type
 };
 
 type Conversation = {
@@ -45,10 +46,10 @@ const ConversationsPage: React.FC = () => {
       // Step 2: Get unique user UUIDs from the conversations
       const uniqueUserUuids = Array.from(new Set(conversations?.map(conv => conv.userUuid)));
 
-      // Step 3: Fetch user names based on the unique UUIDs
+      // Step 3: Fetch user names and emails based on the unique UUIDs
       const { data: usersData, error: userError } = await supabase
         .from('user')
-        .select('uuid, name')
+        .select('uuid, name, email') // Include email here
         .in('uuid', uniqueUserUuids);
 
       if (userError) {
