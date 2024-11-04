@@ -1,6 +1,6 @@
 export default function page() {
   return (
-    <div>
+    <div className="p-5">
       <h2>Privacy Policy</h2>
       <p>
         We want you to understand how we may collect, use, share, and keep

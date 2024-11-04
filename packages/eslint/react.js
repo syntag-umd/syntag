@@ -1,6 +1,6 @@
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
-import ts from "typescript-eslint";
+import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginOnlyWarn from "eslint-plugin-only-warn";
 import path from "path";
@@ -13,7 +13,7 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-export default ts.config(
+export default tseslint.config(
   {
     ignores: [
       // Ignore dotfiles
@@ -41,9 +41,9 @@ export default ts.config(
   },
   js.configs.recommended,
   ...compat.extends("turbo"),
-  ...ts.config({
+  ...tseslint.config({
     files: ["**/*.js?(x)", "**/*.ts?(x)"],
-    extends: [...ts.configs.recommended],
+    extends: [...tseslint.configs.recommended],
     languageOptions: {
       parserOptions: {
         projectService: {

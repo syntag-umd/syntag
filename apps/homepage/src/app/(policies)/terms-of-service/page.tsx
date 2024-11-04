@@ -1,6 +1,6 @@
 export default function page() {
   return (
-    <div>
+    <div className="p-5">
       <h2>Terms of Service</h2>
       <p>
         SynTag, Inc. (SynTag, “we”, “us” or “our”) welcomes you to our website.
