@@ -1,13 +1,10 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+
+const config: Config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./**/*.{ts,tsx}", // Covers all .tsx files in the root and subdirectories
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -73,5 +70,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")]
-}
+  plugins: [require("tailwindcss-animate")],
+};
+
+export default config;
