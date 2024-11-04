@@ -97,9 +97,33 @@ const ConversationsPage: React.FC = () => {
               currentUsers.map(user => (
                 <Link key={user.uuid} href={`/admin/conversations/${user.uuid}`} passHref>
                   <Button
-                    style={{ margin: '5px' }}
+                    style={{
+                      margin: '10px',
+                      textAlign: 'left',
+                      whiteSpace: 'normal',
+                      width: '320px', // Adjust width as needed
+                      height: '100px',
+                      padding: '15px 20px',
+                      backgroundColor: '#f5f7fa', // Light background for admin feel
+                      border: '1px solid #e0e0e0', // Subtle border
+                      borderRadius: '8px', // Rounded corners
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Soft shadow for depth
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease', // Smooth hover effect
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                    }}
                   >
-                    {user.name || 'Unknown User'}
+                    <div>
+                      <strong style={{ fontSize: '16px', color: '#333' }}>{user.name || 'Unknown User'}</strong>
+                      <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>Email: {user.email}</div>
+                    </div>
                   </Button>
                 </Link>
               ))

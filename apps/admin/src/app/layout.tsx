@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <Link href="/admin/home">Home</Link> {/* Link to Home */}
                   </Menu.Item>
                   <Menu.Item key="2" icon={<RobotOutlined />}>
-                    <Link href="/admin/customers">Customers</Link> {/* Link to Customers */}
+                    <Link href="/admin/users">Users</Link> {/* Link to Customers */}
                   </Menu.Item>
                   <Menu.Item key="3" icon={<MessageOutlined />}>
                     <Link href="/admin/conversations">Conversations</Link> {/* Link to Conversations */}
