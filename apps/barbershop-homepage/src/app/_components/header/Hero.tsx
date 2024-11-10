@@ -1,51 +1,55 @@
 import Link from "next/link";
 import ActionButton from "../ui/ActionButton";
+import ModifiedActionButton from "../ui/ModiifedActionButton";
 import Demo from "./Demo";
+import { Radius } from "lucide-react";
 
 export default function Hero() {
   return (
     <div className="flex md:flex-row flex-wrap w-full mt-10 mb-4">
-      <div className="w-full lg:w-1/2 p-3 text-center lg:text-left">
-        <h1 className="font-extrabold text-[3rem] sm:text-[4rem] md:text-[5.5rem] text-wrap leading-none">
-          AI Receptionists made{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F84F4F] to-[#FF8C8C]">
-            easy
-          </span>
-        </h1>
-        <div className="my-10">
-          <h2 className="font-medium text-[1.25rem] mb-5">
-            Enjoy a quieter phone and let SynTag handle all your customer calls
-            instantly. Grow revenue and save time, so you can work on what
-            matters most.
-          </h2>
-          <div className="bg-black text-white p-1 px-2 m-auto lg:m-0 w-fit text-nowrap rounded-full">
-            <span className="hidden sm:inline-block">
-              {" "}
-              Schedule a call with us and get{" "}
-            </span>{" "}
-            300 minutes of calling for free
+      <div className="flex md:flex-row" >
+        <div className="w-full lg:w-1/2 p-3 text-center lg:text-left">
+          <div style={{ padding: "20px" }} className="flex flex-row">
+            <div className="gold" style={{ borderRadius: "27px", backgroundColor: "white", color: "black"}} >
+              <ModifiedActionButton name = "New" arrow={false}/>
+            </div>
+            <div style={{ borderRadius: "27px", backgroundColor: "black", color: "white"}} >
+              <ModifiedActionButton name = "Introducing AI Editor" arrow={true}/> 
+            </div>
+          </div>
+          <h1 style = {{ fontSize: "57px" }}className="font-extrabold text-[3rem] sm:text-[4rem] md:text-[5.5rem] text-wrap leading-none">
+            AI Receptionists made{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7D6E50] to-[#6C592E]">
+              easy
+            </span>
+          </h1>
+          <div className="my-10">
+            <h2 className="font-medium text-[1.25rem] mb-5 text-transparent bg-clip-text bg-gradient-to-r from-[#87878C] to-[#87878C]">
+              Enjoy a quieter phone and let SynTag handle all your customer calls
+              instantly. Grow revenue and save time, so you can work on what
+              matters most.
+            </h2>
+          </div>
+          <div className="flex flex-row mt-4 gap-4 justify-center lg:justify-start">
+            <div>
+            <Link href="https://dashboard.syntag.ai/">
+              <ActionButton className="start-now bg-gradient-to-r from-[#7D6E50] to-[#6C592E] text-black" name="Start Now" arrow={true} />
+            </Link>
+            </div>
+            <div>
+            <Link href="https://calendly.com/vikram-from-syntag/30min">
+              <ActionButton
+                className="my-next-button bg-black border border-2 border-[#7D6E50] text-white"
+                name="Contact Sales"
+                arrow={true}
+              />
+            </Link>
+            </div>
           </div>
         </div>
-        <div className="flex flex-row mt-4 gap-4 justify-center lg:justify-start">
-          <Link href="https://dashboard.syntag.ai/">
-            <ActionButton name="Start Now" arrow={true} />
-          </Link>
-          <Link href="https://calendly.com/vikram-from-syntag/30min">
-            <ActionButton
-              className="bg-black"
-              name="Contact Sales"
-              arrow={false}
-            />
-          </Link>
+        <div className="flex-grow">
+          <Demo className="w-full H-full"/>
         </div>
-      </div>
-      <div className="w-full lg:w-1/2 relative">
-        <img
-          className="hidden lg:block rounded-lg absolute top-0 left-52 min-w-[900px] min-h-[500px] overflow-visible"
-          src="/dashboard.png"
-          alt="SynTag dashboard analytics"
-        />
-        <Demo className="relative lg:left-32 mx-auto mt-12 lg:mx-0 lg:mt-[16rem]" />
       </div>
       {/* left circle */}
       <div className="hidden sm:block absolute -top-1 -left-1/4 transform -translate-x-1/2 md:ml-[400px] -z-10">
