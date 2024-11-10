@@ -13,7 +13,7 @@ export default function ActionButton({ name, arrow, className }: ActionButton) {
                     transition shadow-sm hover:scale-110 ease-out duration-500 ${className}`}
     >
       <div>{name}</div>
-      {arrow && <ArrowRight size={20} />}
+      {arrow && <ArrowRight size={20} style={{ transform: 'rotate(315deg)' }} />}
     </button>
   );
 }
