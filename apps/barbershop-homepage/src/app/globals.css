@@ -2,10 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/*:root {
   --background: #ffffff;
   --foreground: #090909;
   --primary: #E06666;
+  --primary-foreground: #ffffff;
+  --secondary: #161616;
+  --secondary-foreground: #ffffff;
+  --muted: #e7e7e5;
+  --destructive: #b83333;
+  --card: #0F0B0A;
+}*/
+
+:root {
+  --background: #0F1014;
+  --foreground: #ffffff;
+  /*--primary: #ffffff;*/
   --primary-foreground: #ffffff;
   --secondary: #161616;
   --secondary-foreground: #ffffff;
@@ -37,6 +49,84 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+.start-now {
+  border-radius: 10px;
+  color: black;
+  text-align: center;
+  display: inline-flex; 
+  justify-content: center; 
+  align-items: center; 
+}
+
+.my-next-button {
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+}
+.starter-get-started {
+    border-radius: 10px;
+    text-align: center;
+    display: inline-flex; 
+    justify-content: center; 
+    align-items: center; 
+    color: white;
+    background: -webkit-linear-gradient(#7D6E50, #6C592E);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.contact-sales-nav {
+  border-radius: 27px;
+  text-align: center;
+  display: inline-flex; 
+  justify-content: center; 
+  align-items: center; 
+  background: -webkit-linear-gradient(#7D6E50, #6C592E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.setup-action-button {
+  border-radius: 27px;
+  text-align: center;
+  justify-content: center; 
+  align-items: center; 
+  display: flex; 
+  flex-grow: 1;
+  height: 10%;
+  background: linear-gradient(to right, #7D6E50, #6C592E);
+}
+.dashboard-nav {
+  border-radius: 27px;
+  text-align: center;
+  display: inline-flex; 
+  justify-content: center; 
+  align-items: center; 
+  background: linear-gradient(to right, #7D6E50, #6C592E);  
+  color: black;
+}
+.large-text {
+  font-size: x-large;
+  font-weight: bold;
+}
+.small-text {
+  font-size: x-small;
+}
+.triangle-banner {
+  clip-path: polygon(0 0, 100% 0, 100% 100%); 
+  background: linear-gradient(to right, #7D6E50, #6C592E);  
+  border-radius: 0px 10px 0px 0px;
+}
+.triangle-banner > div {
+  position: absolute;
+  top: 30%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+}
+.price {
+  align-items: baseline; /* Align text baselines */
+}
+.gold {
+  background: linear-gradient(to right, #7D6E50, #6C592E);
 }
 
 @layer base {
