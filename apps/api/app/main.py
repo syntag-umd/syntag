@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import json
 import os
 import traceback
@@ -9,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 # api key auth
 from fastapi.security.api_key import APIKeyHeader, APIKeyQuery
-from app.database.session import db_session
+from app.database.session import get_db
 from app.routes.custom_llm.utils import warmup_custom_llm
 from app.routes.whoami import router as whoami
 from app.routes.vapi.route import router as vapi_router
@@ -26,7 +27,8 @@ from fastapi.exception_handlers import (
 )
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from app.instrumentation import global_tracer
-
+from app.services.llm import langfuse
+from sqlalchemy.orm import Session
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -36,7 +38,31 @@ api_key_header = APIKeyHeader(name="X-API-Key")
 
 
 def create_app() -> FastAPI:
-    app = FastAPI()
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        # Operation on startup
+        logging.info("===Startup event===")
+        try:
+            db_generator = get_db()  # Get the generator instance
+            db: Session = next(db_generator)
+            success, data = await warmup_custom_llm(db)
+            if not success:
+                logging.warn("Startup failed: " + json.dumps(data))
+            else:
+                logging.info("Startup successful")
+        except Exception as e:
+            logging.error(f"Startup event warmup: {e}")
+
+        yield  # wait until shutdown
+
+        logging.info("===Shutdown event===")
+        langfuse.flush()
+        global_tracer.force_flush()
+
+    logging.info("===Created app===")
+    
+    app = FastAPI(lifespan=lifespan)
 
     FastAPIInstrumentor.instrument_app(
         app,
@@ -91,25 +117,6 @@ def create_app() -> FastAPI:
     app.include_router(squire_router, tags=["Squire"])
     app.include_router(record_call_router, tags=["Record Call"])
     app.openapi_version = "3.0.0"
-
-    @app.on_event("startup")
-    async def startup_event():
-        logging.info("===Startup event===")
-        try:
-            db = db_session()
-            success, data = await warmup_custom_llm(db)
-            if not success:
-                logging.warn("Startup failed: " + json.dumps(data))
-            else:
-                logging.info("Startup successful")
-        except Exception as e:
-            logging.error(f"Startup event warmup: {e}")
-
-    @app.on_event("shutdown")
-    async def shutdown_event():
-        logging.info("===Shutdown event===")
-
-    logging.info("===Created app===")
 
     return app
 
