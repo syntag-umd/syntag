@@ -12,7 +12,7 @@ from fastapi.responses import StreamingResponse
 import tiktoken
 from app.services.pinecone.utils import pc_index
 from app.core.config import settings
-from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
+from app.services.llm import azure_text3large_embedding, azure_gpt4o_mini
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from app.utils import suppress_library_logging
@@ -129,6 +129,7 @@ def truncate_conversation(messages: List[Message], max_tokens=8000):
 
     return truncated_message
 
+
 @tracer.start_as_current_span("warmup_custom_llm")
 async def warmup_custom_llm(
     session: Session,
@@ -141,10 +142,7 @@ async def warmup_custom_llm(
         logging.info(f"{readable_utc_time}===Warming up Custom LLM===")
 
     async def measure_coroutine_time(
-        name: str,
-        coroutine_func,
-        *args,
-        **kwargs
+        name: str, coroutine_func, *args, **kwargs
     ) -> Tuple[str, Union[int, None]]:
         start = time.time()
         try:

@@ -66,7 +66,7 @@ from app.database.tables.chunks import Chunk, SplitTypes
 from app.database.tables.knowledge import Knowledge
 from app.database.tables.user import User
 from app.models.enums import DEFAULT_TOKEN_COUNT
-from app.services.openai.utils import create_embeddings_ingest
+from app.services.llm import create_embeddings_ingest
 from app.services.pinecone.utils import upsert_vectors
 from app.utils import get_user_from_req
 from pinecone.grpc import GRPCVector
@@ -83,7 +83,7 @@ from google.protobuf.struct_pb2 import Struct
 from markdownify import markdownify as md
 import re
 from app.services.pinecone.utils import pc_index
-from app.services.openai.utils import (
+from app.services.llm import (
     langchain_azure_embeddings_westus3,
     langchain_azure_embeddings_canadaeast,
     langchain_openai_embeddings,
