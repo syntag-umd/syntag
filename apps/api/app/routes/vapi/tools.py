@@ -119,8 +119,8 @@ def create_get_barber_for_appointment_tool(service_types, barber_names):
             )
         },
         "function": {
-            "name": "check_walkin_availability",
-            "description": "Call this function when a customer asks for walk-in availability. Calling this function will tell you exactly what to say to the customer. Again, while this function does retrieve available times, it is meant to tell you exactly what to say in response. However, you are free to translate the response into the language the customer speaks.",
+            "name": "check_availability_on_day_and_time",
+            "description": "Call this function when a customer asks for the availability of a specific barber at a specific time. Calling this function will tell you exactly what to say to the customer. Again, while this function does retrieve available times, it is meant to tell you exactly what to say in response. However, you are free to translate the response into the language the customer speaks.",
             "parameters": {
                 "type": "object",
                 "properties": {
