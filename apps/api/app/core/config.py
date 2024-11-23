@@ -92,7 +92,7 @@ settings = Settings()
 def get_base_url(request: Request):
     """
     Should include the protocol and the domain.
-    - On azure, the base_url will be http instead of https.
+    - On azure, the request.base_url will be http instead of https.
     Be aware of that."""
     if settings.BASE_URL:
         base_url = settings.BASE_URL
