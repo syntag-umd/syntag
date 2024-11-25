@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 from typing_extensions import TypedDict
 
 from sqlalchemy import UUID, Boolean, Column, Enum, ForeignKey, Integer, Text, text
@@ -52,7 +52,7 @@ class Conversation(Base):
     )
 
     medium: ChatMedium = Column(Enum(ChatMedium, name="Medium"), nullable=False)
-    language: Language = Column(Enum(Language, name="Language"), nullable=False)
+    language: Language = Column(Enum(Language, name="Language"), nullable=True)
     tokenCount: int = Column(Integer, nullable=False, default=0)
     durationInSeconds: int = Column(Integer, nullable=False, server_default=text("0"))
 
@@ -63,9 +63,12 @@ class Conversation(Base):
     voice_assistant = relationship("VoiceAssistant", back_populates="conversations")
 
     vapiCallId: str = Column(Text, nullable=True, unique=True)
+    twilio_call_sid: str = Column(Text, nullable=True)
 
-    assistant_pn = Column(Text, nullable=True)
-    caller_pn = Column(Text, nullable=True)
+    assistant_pn: str = Column(Text, nullable=True)
+    caller_pn: str = Column(Text, nullable=True)
+    direction: Literal["inbound", "outbound"] = Column(Text, nullable=True)
+
     summary: str = Column(Text, nullable=True)
 
     starred = Column(

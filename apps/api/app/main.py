@@ -21,7 +21,6 @@ from app.routes.test import router as test_router
 from app.routes.squire.route import router as squire_router
 from app.routes.record_call.route import router as record_call_router
 from app.routes.sapi.route import router as sapi_router
-from app.routes.sapi.route import telephony_server
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exception_handlers import (
     http_exception_handler,
