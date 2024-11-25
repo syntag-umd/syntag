@@ -30,7 +30,9 @@ class Settings(BaseSettings):
     AZURE_DOCUMENT_INTELLIGENCE_API_KEY: str = ""
     BASE_URL: Optional[str] = None
     DATABASE_URL: str = ""
+    DEEPGRAM_API_KEY: str = ""
     DIRECT_URL: str = ""
+    ELEVEN_LABS_API_KEY: str = ""
     ENVIRONMENT: Optional[str] = "development"  # default value
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
@@ -89,14 +91,16 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-def get_base_url(request: Request):
+def get_base_url(request: Optional[Request]):
     """
     Should include the protocol and the domain.
     - On azure, the request.base_url will be http instead of https.
     Be aware of that."""
     if settings.BASE_URL:
         base_url = settings.BASE_URL
-    else:
+    elif request:
         base_url = str(request.base_url)
+    else:
+        raise ValueError("No request object or BASE_URL set in the environment")
 
     return base_url.rstrip("/")
