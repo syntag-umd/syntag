@@ -224,16 +224,6 @@ router.include_router(telephony_server.get_router())
 
 
 # TODO
-# Without redis
-# Create your own function for handling the inbound calls that uses SynTag database
-# Create your own function for handling websocket connection, that loads from SynTag database,
-
-# With redis
-# Create your own function for handling the inbound calls using SynTag database. Write that to the redis cache
-
-# It does seem better to create both routes yourself so that way you can use the otel and have more control
-
-# TODO
 # Use azure gpt-4o-mini for the request
 
 # TODO
