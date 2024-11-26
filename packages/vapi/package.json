@@ -15,6 +15,6 @@
   "devDependencies": {
     "@syntag/eslint-config": "workspace:*",
     "@syntag/tsconfig": "workspace:*",
-    "eslint": "^9.13.0"
+    "eslint": "^9.15.0"
   }
 }
