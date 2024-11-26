@@ -1,3 +1,4 @@
-import eslintConfig from "@syntag/eslint-config/library.js";
+import { config } from "@syntag/eslint-config/base";
 
-export default [...eslintConfig];
+/** @type {import("eslint").Linter.Config} */
+export default config;
