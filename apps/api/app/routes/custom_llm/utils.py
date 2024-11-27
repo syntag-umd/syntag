@@ -7,18 +7,24 @@ from typing import Dict, List, Literal, Tuple, Union
 
 from sqlalchemy import text
 from app.models.enums import DEFAULT_TOKEN_COUNT
-from nlp_syntag.llm.vapi import Message
+from app.models.vapi_schemas import Message
 from fastapi.responses import StreamingResponse
 import tiktoken
+from openai import OpenAI, AsyncOpenAI
 from app.services.pinecone.utils import pc_index
 from app.core.config import settings
 from app.services.openai.utils import azure_text3large_embedding, azure_gpt4o_mini
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-from app.utils import suppress_library_logging
-from opentelemetry import trace
 
-tracer = trace.get_tracer(__name__)
+from app.utils import suppress_library_logging
+
+
+OPENAI_API_KEY = settings.OPENAI_API_KEY
+
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
+
+async_openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
 def generate_chat_response(content: str, role="assistant") -> StreamingResponse:
@@ -129,26 +135,24 @@ def truncate_conversation(messages: List[Message], max_tokens=8000):
 
     return truncated_message
 
-@tracer.start_as_current_span("warmup_custom_llm")
+
 async def warmup_custom_llm(
     session: Session,
     timeout=10,
     logging_arg: Literal["info", "error", "none"] = settings.LOGGING_WARMUP_CUSTOM_LLM,
 ) -> tuple[bool, Dict[str, Union[int, None]]]:
+
     if logging_arg == "info":
         now_utc = datetime.now(timezone.utc)
         readable_utc_time = now_utc.strftime("%b %d %I:%M:%S %p")
         logging.info(f"{readable_utc_time}===Warming up Custom LLM===")
 
     async def measure_coroutine_time(
-        name: str,
-        coroutine_func,
-        *args,
-        **kwargs
-    ) -> Tuple[str, Union[int, None]]:
+        name, coroutine, *args
+    ) -> tuple[str, Union[int, None]]:
         start = time.time()
         try:
-            await asyncio.wait_for(coroutine_func(*args, **kwargs), timeout)
+            await asyncio.wait_for(coroutine(*args), timeout)
         except asyncio.TimeoutError:
             return (name, None)
         return (name, round((time.time() - start) * 1000))
@@ -175,25 +179,20 @@ async def warmup_custom_llm(
             pass
 
     coroutines = [
-        # Database operation (sync function)
         measure_coroutine_time(
             "Db", asyncio.to_thread, session.execute, text("SELECT 1")
         ),
-        # Pinecone (Sync function, wrapped with `asyncio.to_thread`)
         measure_coroutine_time(
             "Pinecone", asyncio.to_thread, pc_index.describe_index_stats
         ),
-        # LLM (Async function)
         measure_coroutine_time("LLM", catch_llm),
-        # Embedding (Async function)
         measure_coroutine_time("Embedding", catch_embedding),
     ]
-
     results = await asyncio.gather(*coroutines)
     success_flag = True
     for name, elapsed_time in results:
         if elapsed_time is None:
-            # success_flag = False
+            success_flag = False
             if logging_arg == "error" or logging_arg == "info":
                 logging.info(f"{name} timed out")
         else:

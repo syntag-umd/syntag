@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import pytz
 
+
 def build_default_prompt(shop_name, barber_list_string, service_list_string, timezone):
     def get_reminder_text():
         return (
@@ -64,26 +65,21 @@ def build_default_prompt(shop_name, barber_list_string, service_list_string, tim
         day_and_month = format_date(current_date)
         day_suffix = get_day_suffix(current_date.day)
         current_time = current_date.strftime("%I:%M%p").lower().lstrip("0")
-
+        next_two_days = get_next_two_weekdays(current_date)
+        next_day_1 = next_two_days[0]
+        next_day_2 = next_two_days[1]
+        next_day_1_date = format_date(next_day_1)
+        next_day_2_date = format_date(next_day_2)
+        next_day_1_suffix = get_day_suffix(next_day_1.day)
+        next_day_2_suffix = get_day_suffix(next_day_2.day)
         prompt = (
             f"Keep in mind today's date. Today is {day_of_week}, {day_and_month}{day_suffix}. "
-            f"The time is {current_time}. "
+            f"The time is {current_time}. That means that {next_day_1.strftime('%A')} "
+            f"corresponds to {next_day_1_date}{next_day_1_suffix}, and "
+            f"{next_day_2.strftime('%A')} corresponds to {next_day_2_date}{next_day_2_suffix}. "
+            f"We cannot book appointments in the past."
         )
-
-        # Generate the next 6 days
-        for days_ahead in range(1, 7):
-            next_day = current_date + timedelta(days=days_ahead)
-            next_day_of_week = next_day.strftime("%A")
-            next_day_date = format_date(next_day)
-            next_day_suffix = get_day_suffix(next_day.day)
-            prompt += (
-                f"{next_day_of_week} corresponds to {next_day_date}{next_day_suffix}, "
-                f"which is {days_ahead} day{'s' if days_ahead > 1 else ''} ahead. "
-            )
-
-        prompt += "We cannot book appointments in the past."
         return prompt
-
 
     base_prompt = get_base_prompt(shop_name, barber_list_string, service_list_string)
     booking_prompt = generate_booking_prompt(timezone)
@@ -91,8 +87,9 @@ def build_default_prompt(shop_name, barber_list_string, service_list_string, tim
 
     default_prompt += """
     When you are booking an appointment and it comes time to ask for the user's phone number,
-    ask if the number they are calling from is OK to send a confirmation text to first. Additionally,
-    never book an appointment without collecting the user's first and last name.
+    ask if the number they are calling from is OK first. Also, don't ask for the user's email address.
+    Instead, ask if they would like to receive an optional confirmation email, or if a text is fine.
+    If they say they want the confirmation email, ask for their email address.
     """
 
     return default_prompt

@@ -8,8 +8,7 @@ from sqlalchemy.orm import relationship, Mapped
 
 from app.database.session import Base
 
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union
-from typing_extensions import TypedDict
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, TypedDict, Union
 
 from app.services.vapi.generated_models import Assistant
 

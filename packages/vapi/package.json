@@ -2,19 +2,14 @@
   "name": "@syntag/vapi",
   "version": "1.0.0",
   "keywords": [],
+  "devDependencies": {
+    "@syntag/tsconfig": "workspace:*"
+  },
   "author": "",
   "license": "ISC",
-  "scripts": {
-    "lint": "eslint ."
-  },
   "dependencies": {
     "@types/react": "^18.3.3",
     "@vapi-ai/web": "^1.1.7",
     "react": "^18.3.1"
-  },
-  "devDependencies": {
-    "@syntag/eslint-config": "workspace:*",
-    "@syntag/tsconfig": "workspace:*",
-    "eslint": "^9.15.0"
   }
 }

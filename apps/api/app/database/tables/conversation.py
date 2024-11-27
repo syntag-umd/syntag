@@ -1,8 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
-from typing_extensions import TypedDict
+from typing import List, Optional, TypedDict
 
 from sqlalchemy import UUID, Boolean, Column, Enum, ForeignKey, Integer, Text, text
 from sqlalchemy.dialects.postgresql import JSONB, TIMESTAMP

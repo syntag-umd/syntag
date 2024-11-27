@@ -14,8 +14,9 @@
     "**/*.ts", 
     "**/*.tsx", 
     ".next/types/**/*.ts",
-    "**/*.mjs",
+    ".eslintrc.cjs",
+    "**/*.cjs",
     "**/*.js",
   ],
-  "exclude": ["node_modules", ".next", ".turbo"]
+  "exclude": ["node_modules"]
 }

@@ -17,7 +17,7 @@ def chunker(seq, batch_size):
     )
 
 
-async def upsert_vectors(data: List[GRPCVector], user_uuid, batch_size=100):
+def upsert_vectors(data: List[GRPCVector], user_uuid, batch_size=100):
 
     async_results = []
     for chunk in chunker(data, batch_size):

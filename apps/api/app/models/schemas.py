@@ -2,7 +2,7 @@ from dataclasses import fields
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional
 import uuid
-from pydantic import UUID4, BaseModel, ConfigDict, Field, model_validator
+from pydantic import UUID4, BaseModel, ConfigDict, Field, model_validator, EmailStr
 
 from app.models.enums import (
     Role,
@@ -123,7 +123,7 @@ class AppointmentBookingRequest(BaseModel):
     time: str
     firstName: str
     lastName: str
-    email: str
+    email: EmailStr
     phoneNumber: str
 
 

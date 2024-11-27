@@ -71,7 +71,6 @@ export const agentRouter = createTRPCRouter({
         },
         firstMessage: input.firstMessage,
         name: input.name,
-        // @ts-ignore
         model: {
           messages: systemPrompt,
           model: "gpt-3.5-turbo",
@@ -302,7 +301,6 @@ export const agentRouter = createTRPCRouter({
       const vapi_agent_config: CreateAssistantDTO = {
         firstMessage: input.firstMessage,
         name: input.name,
-        // @ts-ignore
         model: {
           messages: systemPrompt,
           model: "gpt-3.5-turbo",

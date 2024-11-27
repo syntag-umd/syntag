@@ -40,13 +40,13 @@ from fastapi import Depends, HTTPException, Request, Path
 from sqlalchemy.orm import Session
 from fastapi.responses import StreamingResponse, JSONResponse
 import tiktoken
-from app.services.openai.utils import async_openai_client
+from openai import AsyncOpenAI
 import asyncio
 from app.database.session import get_db
 from app.services.cache import Cache
 from app.core.config import settings
 
-
+async_openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
 
 async def get_topk_embeddings(

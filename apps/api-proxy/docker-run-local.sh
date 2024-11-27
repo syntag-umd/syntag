@@ -1,4 +1,4 @@
-docker build -t fast-api --build-context packages=../../packages .
+docker build -t fast-api .
 
 cat .env.local .env.development > .env.merged.local
 

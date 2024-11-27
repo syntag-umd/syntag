@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           conversation_uuid: id,
-          message: messages[messages.length - 1]?.content,
+          message: messages[messages.length - 1].content,
         }),
       },
     );

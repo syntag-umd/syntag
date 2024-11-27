@@ -111,6 +111,7 @@ opentelemetry-sdk = "^1.25.0"
 opentelemetry-exporter-otlp-proto-http = "^1.25.0"
 typing-extensions = "^4.12.2"
 pydantic-core = "^2.18.4"
+pydantic = {extras = ["email"], version = "^2.9.2"}
 langchain-core = "^0.2.33"
 langchain-community = "^0.2.12"
 azure-ai-documentintelligence = "^1.0.0b3"
@@ -132,7 +133,6 @@ pytz = "^2024.2"
 google-cloud-speech = "^2.27.0"
 google-cloud-storage = "^2.18.2"
 pusher = "^3.3.2"
-pydantic = "2.8.2"
 
 [tool.poetry.group.dev.dependencies]
 aiohttp = "3.9.1"
@@ -228,9 +228,6 @@ watchfiles = "0.21.0"
 werkzeug = "2.2.3"
 yarl = "1.9.4"
 deptry = "^0.19.1"
-
-[tool.poetry.group.repo.dependencies]
-nlp-syntag = {path = "../../packages/nlp-python", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

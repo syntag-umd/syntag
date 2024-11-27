@@ -16,7 +16,7 @@ export async function getEmbedding(text: string) {
     input: text,
   });
 
-  const embedding = response?.data[0]?.embedding;
+  const embedding = response.data[0].embedding;
 
   if (!embedding) {
     throw Error("Error generating embedding..");

@@ -32,27 +32,3 @@ def standardize_time(time_str):
         return standardized_time
     else:
         raise ValueError(f"Invalid time format: {time_str}")
-
-# Format the time in the requested format
-def format_time_readable(date_time):
-    def hour_to_string(hour, minute):
-
-        # Combine the string based on the hour and minute
-        time_str = f"{hour}:{minute} eastern time"
-
-        return time_str
-
-    # Function to get the day with ordinal suffix
-    def day_with_suffix(day):
-        if 11 <= day <= 13:
-            return f"{day}th"
-        else:
-            suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
-        return f"{day}{suffix}"
-
-    month = date_time.strftime("%B")  # Full month name
-    day = day_with_suffix(date_time.day)
-    hour_minute_str = hour_to_string(date_time.hour, date_time.minute)
-    period = "am" if date_time.hour < 12 else "pm"
-
-    return f"{month} {day}, {hour_minute_str} {period}"
