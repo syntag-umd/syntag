@@ -25,8 +25,7 @@
     },
     "dev": {
       "dependsOn": ["^db:generate"],
-      "cache": false,
-      "persistent": true
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
     },
     "test": {},
     "lint": {},
@@ -46,5 +45,44 @@
   "globalDependencies": [
     ".env*",
     "tsconfig.json"
+  ],
+  "globalEnv": [
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    "CLERK_SECRET_KEY",
+    "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
+    "NEXT_PUBLIC_CLERK_SIGN_UP_URL",
+    "NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL",
+    "NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL",
+    "NEXT_PUBLIC_FASTAPI_BASE_URL",
+    "STRIPE_API_KEY",
+    "GC_SERVICE_EMAIL",
+    "GC_SERVICE_PRIVATE_KEY",
+    "GC_BUCKET_NAME",
+    "GC_PROJECT_ID",
+    "GC_WEBSCRAPER_QUEUE_NAME",
+    "OPENAI_API_KEY",
+    "NEXT_PUBLIC_VAPI_API_KEY",
+    "VAPI_API_KEY",
+    "VAPI_SECRET",
+    "STRIPE_PHONE_NUMBER_PRICE_ID",
+    "STRIPE_AGENT_USAGE_PRICE_ID",
+    "STRIPE_PHONE_NUMBER_FEATURE_KEY",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "NEXT_PUBLIC_FLAG_LIVE_PHONES",
+    "NEW_RELIC_LICENSE_KEY",
+    "NEXT_PUBLIC_VERCEL_ENV",
+    "NEXT_PUBLIC_VERSION",
+    "NEXT_PUBLIC_BROWSER_ANALYTICS",
+    "JINA_API_KEY",
+    "SYNTAG_ADMIN_KEY",
+    "ZILLIZ_API_KEY",
+    "ZILLIZ_PROJECT_ID",
+    "ZILLIZ_CLOUD_REGION",
+    "VERCEL_URL",
+    "CUSTOM_LLM_URL",
+    "ZENDESK_MAIL_APIKEY",
+    "STRIPE_ACCOUNT_BALANCE_PRICE_ID",
+    "STRIPE_BILLING_PORTAL_PAYMENTS"
   ]
 }
