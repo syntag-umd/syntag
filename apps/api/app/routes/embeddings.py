@@ -218,7 +218,7 @@ def split_by_tokens(content: str, knowledge_uuid: str) -> List[Chunk]:
     return db_chunks
 
 
-def ingest_content(db: Session, content: str, knowledge_uuid: str, user: User):
+async def ingest_content(db: Session, content: str, knowledge_uuid: str, user: User):
     """Splits and ingests content of the knowledge"""
 
     semantic_db_chunks = split_by_semantic(content, knowledge_uuid)
@@ -258,7 +258,7 @@ def ingest_content(db: Session, content: str, knowledge_uuid: str, user: User):
     if user.embedding_tokens <= 0:
         raise HTTPException(403, "Not enough embedding tokens")
 
-    embeddings = create_embeddings_ingest(embedding_input)
+    embeddings = await create_embeddings_ingest(embedding_input)
 
     if len(embeddings) != len(db_chunks):
         raise HTTPException(500, "Number of embeddings does not match number of chunks")
@@ -283,7 +283,7 @@ def ingest_content(db: Session, content: str, knowledge_uuid: str, user: User):
             )
         )
 
-    upsert_results = upsert_vectors(pc_vectors, str(user.uuid))
+    upsert_results = await upsert_vectors(pc_vectors, str(user.uuid))
 
     db.commit()
 
@@ -291,7 +291,7 @@ def ingest_content(db: Session, content: str, knowledge_uuid: str, user: User):
 
 
 @router.post("/ingest-document")
-def ingest_document_url(
+async def ingest_document_url(
     doc_url: str = Body(..., embed=True),
     knowledge_uuid: str = Body(..., embed=True),
     user: User = Depends(get_user_from_req),
@@ -368,7 +368,7 @@ def ingest_document_url(
         )
 
     content = "\n".join([doc.page_content for doc in docs])
-    return ingest_content(db, content, knowledge_uuid, user)
+    return await ingest_content(db, content, knowledge_uuid, user)
 
 
 @router.post("/delete-document")

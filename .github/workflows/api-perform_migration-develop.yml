@@ -15,6 +15,7 @@ jobs:
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL_DEVELOP }}
+      ASYNC_DATABASE_URL: ${{ secrets.ASYNC_DATABASE_URL_DEVELOP }}
 
     steps:
       - uses: actions/checkout@v3

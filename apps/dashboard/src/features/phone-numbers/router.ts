@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { z } from "zod";
 import { type inferProcedureOutput, TRPCError } from "@trpc/server";
 import { client } from "~/features/phone-numbers/twilio/server";

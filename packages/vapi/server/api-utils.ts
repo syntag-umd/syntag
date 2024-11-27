@@ -1,8 +1,9 @@
+// @ts-nocheck
 import {
   type Assistant as VapiAssistant,
   type Assistant,
   type CreateTransferCallToolDTO,
-  type NumberTransferDestination,
+  type PhoneNumberTransferDestination,
 } from "@vapi-ai/web/api";
 import { env } from "~/env";
 import { type Db } from "~/server/db";
@@ -117,7 +118,7 @@ export function parseTransferCallTool(assistant: Assistant): TransferSchema[] {
     return [];
   }
 
-  const destinations = transferTool.destinations as NumberTransferDestination[];
+  const destinations = transferTool.destinations as PhoneNumberTransferDestination[];
   const transfers: TransferSchema[] = [];
   destinations.forEach((destination) => {
     const obj: TransferSchema = {

@@ -1,14 +1,17 @@
 import asyncio
-from typing import Optional
+from typing import Optional, List
 import aiohttp
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from collections import defaultdict
-from app.routes.squire.defaultPrompt import build_default_prompt
+import pytz
+from itertools import groupby
 
+from app.routes.squire.defaultPrompt import build_default_prompt
+import logging
 
 class BarberBookingClient:
-    def __init__(self, booking_link: Optional[str], shop_name: Optional[str] = None):
+    def __init__(self, booking_link: Optional[str] = None, shop_name: Optional[str] = None):
         if not booking_link:
             if not shop_name:
                 raise ValueError("Either booking_link or shop_name must be provided")
@@ -60,7 +63,7 @@ class BarberBookingClient:
         shop_id = None
         barber_name_to_id = {}
 
-        for item in data[:1]:
+        for item in data:
             barber_info = item.get("barber", {})
 
             first_name = barber_info.get("firstName", "")
@@ -184,15 +187,20 @@ class BarberBookingClient:
 
         return prompt
 
-    async def get_prompt(self):
+    async def get_prompt_and_assistant_config(self):
         prompt = ""
 
         start_time = datetime.now().strftime("%Y-%m-%d")
         end_time = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+        
+        barber_names_to_ids = {}
 
         fetch_services_tasks = []
         for barber_name, barber_info in self.barbers.items():
             barber_id = barber_info["id"]
+            
+            barber_names_to_ids[barber_name] = barber_id
+            
             barber_min_service_length = barber_info["min_service_length"]
             task = self.fetch_services(barber_id, barber_name)
             fetch_services_tasks.append(
@@ -284,18 +292,218 @@ class BarberBookingClient:
 
             prompt += "\n\n"
 
-            durations_availabilities = sorted(
-                barber_availability[barber_name], key=lambda x: x[0]
-            )
-            for (
-                duration,
-                barber_min_service_length,
-                raw_json_availability,
-            ) in durations_availabilities:
-                prompt += f"Duration: {duration} minutes\n\n"
-                prompt += self.create_availability_prompt(
-                    raw_json_availability, duration, barber_min_service_length
-                )
-                prompt += "\n"
+            # durations_availabilities = sorted(
+            #     barber_availability[barber_name], key=lambda x: x[0]
+            # )
+            # for (
+            #     duration,
+            #     barber_min_service_length,
+            #     raw_json_availability,
+            # ) in durations_availabilities:
+            #     prompt += f"Duration: {duration} minutes\n\n"
+            #     prompt += self.create_availability_prompt(
+            #         raw_json_availability, duration, barber_min_service_length
+            #     )
+            #     prompt += "\n"
 
-        return prompt
+        return {
+            "prompt": prompt,
+            "barber_names_to_ids": barber_names_to_ids,
+            "services": unique_services,
+            "timezone": timezone,
+        }
+    
+    def extract_available_times(self, availability_data, target_tz_str):
+        # Returns a list of datetime objects representing available times in target timezone
+        available_times = []
+        time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+        target_tz = ZoneInfo(target_tz_str)
+        for day_info in availability_data:
+            if day_info["availability"] > 0:
+                times = day_info["times"]
+                for period in ["morning", "afternoon", "evening"]:
+                    for time_slot in times.get(period, []):
+                        if time_slot["available"]:
+                            time_str = time_slot["time"]
+                            time_obj = datetime.strptime(time_str, time_format)
+                            # The time from API is in UTC
+                            time_obj = time_obj.replace(tzinfo=ZoneInfo("UTC")).astimezone(target_tz)
+                            available_times.append(time_obj)
+        return available_times
+
+
+    async def get_next_n_openings(self, timezone_str: str, services_list: List[str], barber_ids: List[str], n: int, n_days_ahead: int = 0):
+        openings = []
+        now_utc = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
+        now_target_tz = now_utc.astimezone(ZoneInfo(timezone_str))
+        start_date = now_target_tz.date() + timedelta(days=n_days_ahead)
+        start_time = start_date.strftime("%Y-%m-%d")
+        end_time = start_time
+
+        for barber_id in barber_ids:
+            # Get barber_name
+            barber_name = None
+            for name, info in self.barbers.items():
+                if info['id'] == barber_id:
+                    barber_name = name
+                    break
+                
+            logging.info(self.barbers)
+            logging.info(barber_id)
+            logging.info(barber_name)
+            if not barber_name:
+                continue  # Barber not found
+
+            # Fetch services
+            barber_services = await self.fetch_services(barber_id, barber_name)
+            services_json = barber_services[1]
+            processed_services = self.process_services(services_json)
+            
+            logging.info(processed_services)
+
+            # Filter services
+            matching_services = [s for s in processed_services if s['service_name'].strip() in [s.strip() for s in services_list]]
+            
+            logging.info(matching_services)
+
+            if not matching_services:
+                continue  # Barber does not offer the desired services
+
+            for service in matching_services:
+                service_id = service['id']
+                service_name = service['service_name']
+                duration = service['duration']
+
+                # Fetch availability
+                availability_data = await self.fetch_availability(barber_id, start_time, end_time, duration)
+
+                # Extract available times
+                available_times = self.extract_available_times(availability_data, timezone_str)
+
+                for available_time in available_times:
+                    weekday_name = available_time.strftime('%A')
+                    time_str = available_time.strftime('%I:%M %p')
+                    openings.append({
+                        'barber_id': barber_id,
+                        'barber_name': barber_name,
+                        'service_id': service_id,
+                        'service_name': service_name,
+                        'weekday': weekday_name,
+                        'time': time_str,
+                        'datetime': available_time,  # For accurate sorting
+                    })
+
+        # Sort openings by datetime
+        openings.sort(key=lambda x: x['datetime'])
+
+        # Collect up to n unique times with one opening per time
+        unique_openings = []
+        seen_datetimes = set()
+
+        for opening in openings:
+            dt = opening['datetime']
+            if dt not in seen_datetimes:
+                seen_datetimes.add(dt)
+                # Remove 'datetime' field as it's no longer needed
+                del opening['datetime']
+                unique_openings.append(opening)
+                # if len(unique_openings) == n:
+                #     break
+
+        return unique_openings
+
+    async def are_walkins_allowed(self) -> bool:
+        # Get current time in shop timezone
+        timezone_str = self.shop_timezone or 'UTC'
+        now_utc = datetime.utcnow().replace(tzinfo=ZoneInfo('UTC'))
+        now_shop_tz = now_utc.astimezone(ZoneInfo(timezone_str))
+        now_plus_150 = now_shop_tz + timedelta(minutes=150)
+        start_time = now_shop_tz.strftime('%Y-%m-%d')
+        end_time = start_time  # Only today
+
+        # Initialize set to collect unique available times
+        unique_times = set()
+
+        # Collect fetch_availability tasks for each barber using their minimum service length
+        fetch_availability_tasks = []
+        for barber_name, barber_info in self.barbers.items():
+            barber_id = barber_info['id']
+            min_service_length = barber_info['min_service_length'] or 15  # Default to 15 if None
+            duration = min_service_length
+            task = self.fetch_availability(barber_id, start_time, end_time, duration)
+            fetch_availability_tasks.append((barber_id, task))
+
+        # Await all fetch_availability tasks concurrently
+        availability_results = await asyncio.gather(*(task for _, task in fetch_availability_tasks))
+
+        # Process availability data
+        for (barber_id, _), availability_data in zip(fetch_availability_tasks, availability_results):
+            times = self.extract_available_times(availability_data, timezone_str)
+            for time in times:
+                if now_shop_tz <= time <= now_plus_150:
+                    unique_times.add(time)
+
+        # Count the number of unique times
+        num_unique_times = len(unique_times)
+
+        # Return True if there are more than 4 unique times, else False
+        return num_unique_times > 4
+
+    async def get_barber_for_appointment(self, day_str, time_str, services_list, barber_id=None):
+        """
+        Check if an appointment at the given day and time is available for the given services.
+        If available, return the name of the barber and the service name with which the appointment is available.
+        If barber_id is provided, check availability only for that barber.
+        """
+        shop_timezone = self.shop_timezone or 'UTC'
+
+        # Parse the day and time into datetime object in shop's timezone
+        appointment_datetime = datetime.strptime(f'{day_str} {time_str}', '%Y-%m-%d %H:%M')
+        appointment_datetime = appointment_datetime.replace(tzinfo=ZoneInfo(shop_timezone))
+
+        if barber_id:
+            # Get barber_name
+            barber_name = next((name for name, info in self.barbers.items() if info['id'] == barber_id), None)
+            if not barber_name:
+                return None  # Barber not found
+            barbers_to_check = [(barber_name, barber_id)]
+        else:
+            barbers_to_check = [(name, info['id']) for name, info in self.barbers.items()]
+
+        for barber_name, barber_id in barbers_to_check:
+
+            barber_info = self.barbers[barber_name]
+            min_service_length = barber_info.get('min_service_length') or 15
+
+            # Fetch services offered by the barber
+            barber_services = await self.fetch_services(barber_id, barber_name)
+            services_json = barber_services[1]
+            processed_services = self.process_services(services_json)
+
+            # Filter services to those matching the services_list
+            matching_services = [
+                service for service in processed_services
+                if service['service_name'].strip().lower() in [s.strip().lower() for s in services_list]
+            ]
+            if not matching_services:
+                continue  # This barber does not offer the requested services
+
+            # For each matching service, check availability
+            for service in matching_services:
+                service_id = service['id']
+                service_name = service['service_name']
+                duration = service['duration']
+
+                # Fetch availability for that service duration
+                availability_data = await self.fetch_availability(barber_id, day_str, day_str, duration)
+
+                # Extract available times
+                available_times = self.extract_available_times(availability_data, shop_timezone)
+
+                # Check if appointment_datetime is in available_times
+                if appointment_datetime in available_times:
+                    # Appointment is available with this barber and service
+                    return barber_name, service_name
+
+        # No appointment available at that time
+        return None

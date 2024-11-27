@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Response
 from fastapi.responses import JSONResponse
-from apify_client import ApifyClient
 from app.models.schemas import AppointmentBookingRequest
+import httpx
+
+import logging
 
 from app.routes.squire.barberBookingClient import BarberBookingClient
 
@@ -13,8 +15,8 @@ router = APIRouter(prefix="/squire")
 @router.get("/shop/{shop_name}/prompt")
 async def get_prompt(shop_name: str):
     async with BarberBookingClient(None, shop_name) as client:
-        prompt = await client.get_prompt()
-        return prompt
+        prompt_and_config = await client.get_prompt_and_assistant_config()
+        return prompt["prompt"]
 
 
 @router.post("/shop/{shop_name}/book")
@@ -31,9 +33,6 @@ async def book_appointment(shop_name: str, request: AppointmentBookingRequest):
     """
     booking_link = f"https://getsquire.com/booking/book/{shop_name}"
 
-    # Initialize the ApifyClient with your API token
-    client = ApifyClient(settings.APIFY_TOKEN)
-
     # Prepare the Actor input
     run_input = {
         "url": booking_link,
@@ -46,30 +45,30 @@ async def book_appointment(shop_name: str, request: AppointmentBookingRequest):
         "email": request.email,
         "phoneNumber": request.phoneNumber,
     }
+    
+    logging.info(f"Booking appointment with input: {run_input}")
 
     try:
-        # Run the Actor and wait for it to finish
-        run = client.actor(settings.APIFY_SQUIRE_BOOKING_SCRAPER_ACTOR_ID).call(
-            run_input=run_input
-        )
-
-        kv_store = client.key_value_store(run["defaultKeyValueStoreId"])
-
-        # Get the result status
-        result_record = kv_store.get_record("RESULT")
-        result = result_record["value"]
-
-        # Get the output content
-        output_record = kv_store.get_record("OUTPUT")
-        output_content = output_record["value"]
-
-        if result == "SUCCESS":
-            # The output is an image/png; return it
-            return Response(content=output_content, media_type="image/png")
-        else:
-            # The output is a stack trace; return it as an error message
-            return JSONResponse(content={"error": output_content}, status_code=500)
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            url = f"https://browser.syntag.ai/squire/shop/{shop_name}/book"
+            response = await client.post(url, json=run_input)
+            
+            response.raise_for_status()
+            
+            json_response = response.json()
+            
+            logging.info(f"Response from Squire: {json_response}")
+            
+            message = json_response.get('message', '')
+            if message == "Book added to shop":
+                # Return a 200 status with a success message
+                return {"message": "Booking successful", "success": True}
+            else:
+                # Return the error message from the response
+                error_message = json_response.get('error', 'Unknown error')
+                return {"error": error_message}
 
     except Exception as e:
         # Handle any exceptions that occur during the process
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        logging.error(f"Error during booking: {e}")
+        return e.message

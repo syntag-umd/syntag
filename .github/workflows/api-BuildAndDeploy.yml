@@ -1,0 +1,54 @@
+name: Auto deployment for api
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-BuildAndDeploy.yml"
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Login to Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.SYNTAG_SUBSCRIPTION_AZURE_CREDENTIALS }}
+
+      # Step 3: Login to Azure Container Registry (ACR)
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: syntagregistryfastapi.azurecr.io
+          username: ${{ secrets.SYNTAGREGISTRYFASTAPI_USERNAME }}
+          password: ${{ secrets.SYNTAGREGISTRYFASTAPI_PASSWORD }}
+
+      # Step 4: Build and push the Docker image using docker/build-push-action
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          build-contexts: |
+            packages=./packages 
+          context: ./apps/api
+          push: true
+          tags: syntagregistryfastapi.azurecr.io/api-syntag-images:${{ github.sha }}
+          
+
+      # Step 5: Deploy to Azure Container Apps
+      - name: Deploy to Azure Container Apps
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.52.0
+          inlineScript: |
+            az containerapp update \
+              --name api-syntag \
+              --resource-group syntag-resources \
+              --image syntagregistryfastapi.azurecr.io/api-syntag-images:${{ github.sha }} 

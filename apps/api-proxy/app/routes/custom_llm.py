@@ -9,25 +9,7 @@ from pydantic import BaseModel
 import time
 from opentelemetry.propagate import inject
 from app.utils import suppress_library_logging
-
-
-class Message(BaseModel):
-    role: str
-    content: str
-
-
-class ChatRequest(BaseModel):
-    model: str
-    messages: List[Any]
-    temperature: float
-    tools: Optional[List[Any]] = None
-    stream: bool
-    max_tokens: int
-    call: Any
-    phoneNumber: Optional[Any] = None
-    customer: Optional[Any] = None
-    metadata: Dict[str, Any]
-
+from nlp_syntag.llm.vapi import ChatCallRequest
 
 router = APIRouter(prefix="/custom-llm")
 
@@ -66,15 +48,15 @@ async def ping_proxy():
 
             return {f"{name}": elapsed_time for (name, elapsed_time) in results}
     except Exception as e:
-        logging.error(f"Error on ping: {str(e)}")
-        return {"error": str(e)}
+        logging.error(f"Error on ping: {repr(e)}")
+        return {"error": repr(e)}
 
 
 @router.post("/proxy/{env}/{path}/chat/completions")
 async def get_proxy_response(
     env: Literal["develop", "production"],
     path: Literal["fast", "manual", "openai"],
-    body: ChatRequest,
+    body: ChatCallRequest,
 ):
     est_offset = timedelta(hours=-5)
     est = timezone(est_offset)

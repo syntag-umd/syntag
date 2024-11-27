@@ -8,6 +8,7 @@ from twilio.request_validator import RequestValidator
 from fastapi import FastAPI, Form, Request, Response, HTTPException, APIRouter, Depends
 from twilio.twiml.voice_response import VoiceResponse, Dial
 from twilio.rest import Client
+from twilio.http.async_http_client import AsyncTwilioHttpClient
 from app.database.session import get_db
 from sqlalchemy.orm import Session
 
@@ -17,9 +18,7 @@ import os
 import requests
 from requests.auth import HTTPBasicAuth
 from google.cloud import speech_v1p1beta1 as speech
-
-import openai
-from openai import OpenAI
+from app.services.openai.utils import async_openai_client
 
 import pusher
 
@@ -31,9 +30,7 @@ pusher_client = pusher.Pusher(
     ssl=True
 )
 
-openai_client = OpenAI()
 
-openai.api_key = settings.OPENAI_API_KEY
 
 environment = settings.ENVIRONMENT
 
@@ -49,8 +46,8 @@ else:
 
 account_sid = settings.TWILIO_ACCOUNT_SID
 auth_token = settings.TWILIO_AUTH_TOKEN
-
-client = Client(account_sid, auth_token)
+ahttp_client = AsyncTwilioHttpClient()
+client = Client(account_sid, auth_token, http_client=ahttp_client)
 validator = RequestValidator(auth_token)
 
 recipient_number = '+18578691479'  # Vikram's Number
@@ -336,7 +333,7 @@ async def process_transcript_with_openai(transcription_text):
         "It's critical that you only include the array in your response. Do not include any other text."
     )
 
-    response = openai_client.chat.completions.create(
+    response = await async_openai_client.chat.completions.create(
         model='gpt-4o-mini',
         messages=[
             {'role': 'system', 'content': system_prompt},
