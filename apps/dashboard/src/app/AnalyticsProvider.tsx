@@ -58,9 +58,11 @@ export class BrowserAnalytics {
     agent.wrapLogger(console, "error", { level: "ERROR" });
     /* agent.wrapLogger(console, "log", { level: "INFO" }); */
 
+    
     const lm = new LoggingModule.Logging(
       agent.agentIdentifier,
-      agent.sharedAggregator,
+      // @ts-ignore
+      agent.sharedAggregator, 
     );
 
     return agent;

@@ -9,12 +9,11 @@
       ],
       "outputs": [
         ".next/**",
-        "!.next/cache/**"
+        "!.next/cache/**",
+        "dist/**", 
+        "build/**"
       ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env.local"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
     },
     "deploy": {
       "dependsOn": [
@@ -22,47 +21,30 @@
         "test",
         "lint"
       ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env.local"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
     },
-    "test": {
-      "dependsOn": [
-        "build"
-      ],
-      "inputs": [
-        "src/**/*.tsx",
-        "src/**/*.ts",
-        "test/**/*.ts",
-        "test/**/*.tsx",
-        ".env.test"
-      ]
-    },
-    "lint": {},
     "dev": {
       "dependsOn": ["^db:generate"],
       "cache": false,
       "persistent": true
     },
-    "topo": {
-      "dependsOn": [
-        "^topo"
-      ]
-    },
-    "check-types": {
-      "dependsOn": [
-        "topo"
-      ]
-    },
+    "test": {},
+    "lint": {},
     "db:generate": {
       "cache": false
     },
     "db:push": {
       "cache": false
+    },
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "check-types": {
+      "dependsOn": ["transit"]
     }
   },
   "globalDependencies": [
-    ".env"
+    ".env*",
+    "tsconfig.json"
   ]
 }

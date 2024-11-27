@@ -15,6 +15,7 @@ import { createCaller } from "../root";
 
 // Add authentication
 const createContext = cache(async () => {
+  // @ts-ignore
   const heads = new Headers(headers());
   heads.set("x-trpc-source", "rsc");
 

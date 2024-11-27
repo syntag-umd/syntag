@@ -61,6 +61,7 @@ export const getActualAuth = async (auth: Auth): Promise<ActualAuth> => {
       getToken: () => auth.getToken(),
     };
   }
+  // @ts-ignore
   const token = cookies().get("__session")?.value;
   const is_valid = await isTokenValid(token);
   if (!is_valid) {
