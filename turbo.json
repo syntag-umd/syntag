@@ -8,13 +8,7 @@
         "^db:generate"
       ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [
-        "build/**",
-        ".vercel/**",
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
+      "outputs": [".next/**", "!.next/cache/**"],
       "env": [  
         "DATABASE_URL",
         "DIRECT_URL",
