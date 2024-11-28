@@ -22,9 +22,7 @@ import {
   User2Icon,
   X,
   Phone,
-  Headset,
   PhoneCall,
-  CircleCheckBig,
 } from "lucide-react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 
@@ -68,9 +66,7 @@ export const Icons = {
     </svg>
   ),
   check: Check,
-  checkCircle: CircleCheckBig,
   phone: Phone,
-  assistant: Headset,
   caller: PhoneCall,
   star_outline: FaRegStar,
   star_filled: FaStar,
