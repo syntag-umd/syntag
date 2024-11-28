@@ -7,13 +7,14 @@
         "^build",
         "^db:generate"
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**", 
-        "build/**"
-      ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [
+        "build/**",
+        ".vercel/**",
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
       "env": [  
         "DATABASE_URL",
         "DIRECT_URL",
@@ -56,17 +57,10 @@
         "STRIPE_BILLING_PORTAL_PAYMENTS"
       ]
     },
-    "deploy": {
-      "dependsOn": [
-        "build",
-        "test",
-        "lint"
-      ],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"]
-    },
     "dev": {
-      "dependsOn": ["^db:generate"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
     },
     "test": {},
     "lint": {},
