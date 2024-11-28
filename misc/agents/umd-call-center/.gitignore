@@ -1,0 +1,6 @@
+
+# agent context files
+*.db
+*.json
+*.html
+vector_store
