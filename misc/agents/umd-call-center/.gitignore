@@ -1,5 +1,3 @@
-
-# agent context files
 *.db
 *.json
 *.html
