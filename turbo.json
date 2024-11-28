@@ -84,7 +84,6 @@
   "globalEnv": [
     "NODE_ENV",
     "VERCEL_ENV",
-    "VERCEL_PRODUCT_PRODUCTION_URL",
-    "PORT"
+    "VERCEL_PRODUCT_PRODUCTION_URL"
   ]
 }
