@@ -86,6 +86,11 @@ export default function Setup() {
           </Link>
         </div>
         <div className="flex-col order-last w-full flex xl:hidden">
+          <ActionButton
+            className="mt-10 mx-auto"
+            name="Create Your Own Now"
+            arrow={true}
+          />
           {/* <Link href="https://dashboard.syntag.ai/">
             <ActionButton
               className="mt-10 mx-auto"
@@ -93,13 +98,6 @@ export default function Setup() {
               arrow={true}
             />
           </Link> */}
-          <Link href="">
-            <ActionButton
-              className="mt-10 mx-auto"
-              name="Create Your Own Now"
-              arrow={true}
-            />
-          </Link>
         </div>
       </div>
     </section>

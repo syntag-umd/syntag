@@ -1,6 +1,8 @@
 import Link from "next/link";
 import ActionButton from "../ui/ActionButton";
 import Demo from "./Demo";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel } from "@radix-ui/react-alert-dialog";
+import { AlertDialogHeader, AlertDialogFooter } from "../ui/alert-dialog";
 
 export default function Hero() {
   return (
@@ -27,10 +29,10 @@ export default function Hero() {
           </div>
         </div>
         <div className="flex flex-row mt-4 gap-4 justify-center lg:justify-start">
+          <ActionButton name="Start Now" arrow={true} />
           {/* <Link href="https://dashboard.syntag.ai/">
             <ActionButton name="Start Now" arrow={true} />
           </Link> */}
-          <ActionButton name="Start Now" arrow={true} />
           <Link href="https://calendly.com/vikram-from-syntag/30min">
             <ActionButton
               className="bg-black"
