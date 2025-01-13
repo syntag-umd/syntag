@@ -70,7 +70,14 @@ export default function Setup() {
             data to gain deeper insights into your customers' needs and improve
             overall service.
           </div>
-          <Link href="https://dashboard.syntag.ai/">
+          {/* <Link href="https://dashboard.syntag.ai/">
+            <ActionButton
+              className="mt-10 mx-0 hidden xl:flex "
+              name="Create Your Own Now"
+              arrow={true}
+            />
+          </Link> */}
+          <Link href="">
             <ActionButton
               className="mt-10 mx-0 hidden xl:flex "
               name="Create Your Own Now"
@@ -79,7 +86,14 @@ export default function Setup() {
           </Link>
         </div>
         <div className="flex-col order-last w-full flex xl:hidden">
-          <Link href="https://dashboard.syntag.ai/">
+          {/* <Link href="https://dashboard.syntag.ai/">
+            <ActionButton
+              className="mt-10 mx-auto"
+              name="Create Your Own Now"
+              arrow={true}
+            />
+          </Link> */}
+          <Link href="">
             <ActionButton
               className="mt-10 mx-auto"
               name="Create Your Own Now"
