@@ -60,9 +60,10 @@ export default function Pricing() {
             </CardContent>
           </Card>
         </div>
-        <Link href="https://dashboard.syntag.ai/">
+        <ActionButton className="m-auto" name="Start Now" arrow={true} />
+        {/* <Link href="https://dashboard.syntag.ai/">
           <ActionButton className="m-auto" name="Start Now" arrow={true} />
-        </Link>
+        </Link> */}
       </div>
     </section>
   );

@@ -27,9 +27,10 @@ export default function Hero() {
           </div>
         </div>
         <div className="flex flex-row mt-4 gap-4 justify-center lg:justify-start">
-          <Link href="https://dashboard.syntag.ai/">
+          {/* <Link href="https://dashboard.syntag.ai/">
             <ActionButton name="Start Now" arrow={true} />
-          </Link>
+          </Link> */}
+          <ActionButton name="Start Now" arrow={true} />
           <Link href="https://calendly.com/vikram-from-syntag/30min">
             <ActionButton
               className="bg-black"
